@@ -1,0 +1,30 @@
+@charset "UTF-8";
+.container {
+  height: 100vh;
+}
+
+.main {
+  position: relative;
+  transform: translate(0, -50%);
+  top: 50%;
+}
+
+.bx-shadow {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  border: none;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.login-img {
+	vertical-align: bottom;
+}
+
+.cc-tag {
+    text-decoration: none;
+    transition: text-decoration 0.5s linear;
+}
+
+.cc-tag:hover {
+    text-decoration: underline !important ;
+}
