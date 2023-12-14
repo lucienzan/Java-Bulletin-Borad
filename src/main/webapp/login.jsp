@@ -1,5 +1,7 @@
+<%@page import="org.apache.jasper.tagplugins.jstl.core.If"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,8 +15,16 @@
 		crossorigin="anonymous">
 </head>
 <body>
+<jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
+<jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
+<jsp:setProperty property="*" name="user"/>
 	<div class="container">
 		<div class="row main align-items-center justify-content-center">
+			<c:if test="${ model.getMessageType() == 3 || model.getMessageType() == 2 }" >
+				<div class="alert alert-danger col-8" role="alert">
+			  		<c:out value="${ model.getMessageName() }"></c:out>
+				</div>
+			</c:if>
 			<div class="col-8 col-lg-10 bx-shadow p-5 p-lg-0">
 			<div class="row align-items-center justify-content-between ">
 				<div class="col-10 col-lg-4 m-auto">
@@ -23,14 +33,24 @@
 						<input type="hidden" name="action" value="login">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
-							<input class="form-control" type="email" placeholder="email" required id="email" name="email">
+							<input class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="" placeholder="email" required id="email" name="email">
+							<c:if test="${requestScope.emailError != null}">
+								<div class="invalid-feedback">
+									<c:out value="${requestScope.emailError}" />
+								</div>
+							</c:if>					
 						</div>
 						<div class="form-group mb-3">
 							<div class="d-flex justify-content-between">
 							<label class="form-label" for="password">Password</label> 
 							<a href="#" class="text-decoration-none text-dark">Forgot your password?</a>
 							</div>
-							<input class="form-control" type="password" placeholder="password" required id="password" name="password">
+							<input class="form-control ${not empty requestScope.passwordError ? 'is-invalid' : ''}" type="password" placeholder="password" required id="password" name="password">
+							<c:if test="${requestScope.passwordError != null}">
+								<div class="invalid-feedback">
+									<c:out value="${requestScope.passwordError}" />
+								</div>
+							</c:if>	
 						</div>
 						<button type="submit" class="btn btn-dark w-100 p-2">Log In</button>
 						<div class="text-center mt-4">

@@ -27,9 +27,8 @@ public class DbConnection {
 	
 	public static DbConnection GetInstance()
 	{
-		if(instance == null) {
-			instance = new DbConnection();
-		}
+		instance = new DbConnection();
+		
 		return instance;
 	}
 	

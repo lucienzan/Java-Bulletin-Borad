@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.UUID;
 import bulletin.common.BCrypt;
@@ -39,14 +40,26 @@ public class AccountController extends HttpServlet {
 	}
 
 	private void Login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String email = request.getParameter("email");
-		String password = request.getParameter("password");
+
 		User user = new User();
-
-		user.setEmail(email);
-		user.setPassword(password);
-
-		_accountService.Login(user);
+		boolean errorExist = this.Validation(request, response);
+		if(errorExist) {
+			request.getRequestDispatcher("/login.jsp").include(request, response);
+		} else {
+			user.setEmail(request.getParameter("email"));
+			user.setPassword(request.getParameter("password"));
+			
+			ResponseModel model = _accountService.Login(user);
+			if(model.getMessageType() == Message.SUCCESS) {
+				HttpSession session = request.getSession(true);
+				session.setAttribute("userManager", model.getUserModel());
+				session.setMaxInactiveInterval(30 * 60);
+				request.getRequestDispatcher("/index.jsp").forward(request, response);
+			} else {
+				request.setAttribute("model", model);
+				request.getRequestDispatcher("/login.jsp").include(request, response);
+			}
+		}
 	}
 
 	private void Register(HttpServletRequest request, HttpServletResponse response)
@@ -91,18 +104,18 @@ public class AccountController extends HttpServlet {
 
 		// email check
 		if (email == null) {
-			request.setAttribute("emailError", "Email field is required.");
+			request.setAttribute("emailError", Message.REmail);
 			error = true;
 		} else if (!email.matches(emailPattern)) {
-			request.setAttribute("emailError", "Email format is incorret.");
+			request.setAttribute("emailError", Message.FEmail);
 			error = true;
 		}
 
 		if (password == null) {
-			request.setAttribute("passwordError", "Password field is required.");
+			request.setAttribute("passwordError", Message.RPassword);
 			error = true;
 		} else if (!password.matches(passwordPattern)) {
-			request.setAttribute("passwordError", "Password format is incorret.");
+			request.setAttribute("passwordError", Message.FPassword);
 			error = true;
 		}
 
@@ -111,10 +124,10 @@ public class AccountController extends HttpServlet {
 
 			// password check
 			if (cPassword.toString() == null) {
-				request.setAttribute("cpasswordError", "Confirm password field is required.");
+				request.setAttribute("cpasswordError", Message.RCPassword);
 				error = true;
 			} else if (!password.contentEquals(cPassword)) {
-				request.setAttribute("cpasswordError", "Password and confirm password must be the same.");
+				request.setAttribute("cpasswordError", Message.PasswordMatch);
 				error = true;
 			}
 		}

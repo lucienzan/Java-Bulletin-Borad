@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import bulletin.common.BCrypt;
 import bulletin.common.DbConnection;
 import bulletin.common.Message;
 import bulletin.dao.IRepositories.IAuthRepository;
@@ -20,13 +21,14 @@ public class AuthRepository implements IAuthRepository {
 		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
-
+		ResultSet resultSet = null;
+		
 		try {
 			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ?";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
 
-			ResultSet resultSet = preparedStatement.executeQuery();
+			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 
 			int count = resultSet.getInt(1);
@@ -34,6 +36,7 @@ public class AuthRepository implements IAuthRepository {
 				// Email already exists, handle accordingly
 				model.setMessageName(Message.AccountExist);
 				model.setMessageType(Message.EXIST);
+				
 			} else {
 				sqlQuery = "INSERT INTO user (Id,FirstName,Email,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
 				sqlQuery += "VALUES (?,?,?,?,?,?,?)";
@@ -59,18 +62,58 @@ public class AuthRepository implements IAuthRepository {
 		} catch (SQLException e) {
 			model.setMessageName(Message.AccountFail);
 			model.setMessageType(Message.FAIL);
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		DbConnection.CloseConnection(con, preparedStatement);
+		    DbConnection.CloseConnection(con, preparedStatement,resultSet);
+		    
 		return model;
 	}
 
 	public ResponseModel Login(User obj) {
-		// TODO Auto-generated method stub
-		System.out.println(obj.getEmail());
+		ResponseModel model = new ResponseModel();
+		User user = new User();
+		
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		
+		try {
+			sqlQuery = "SELECT * FROM user WHERE Email = ?";
+			
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, obj.getEmail());
 
-		return null;
+			resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				user.setId(resultSet.getString("Id"));
+				user.setEmail(resultSet.getString("Email"));
+				user.setFirstName(resultSet.getString("FirstName"));
+				user.setDeletedFlag(resultSet.getBoolean("DeleteFlag"));
+				
+				if(user.isDeletedFlag()) {
+					model.setMessageName(Message.AccountNotFound);
+					model.setMessageType(Message.EXIST);
+				}else {
+					boolean matched = BCrypt.checkpw(obj.getPassword(), resultSet.getString("Password"));
+					if(matched) {
+						model.setUserModel(user);
+						model.setMessageName(Message.LoginSuccess);
+						model.setMessageType(Message.SUCCESS);
+					}else {
+						model.setMessageName(Message.LoginFail);
+						model.setMessageType(Message.FAIL);
+					}
+				}
+			}
+		}catch (Exception e) {
+			model.setMessageName(Message.LoginFail);
+			model.setMessageType(Message.FAIL);
+			e.printStackTrace();
+		}
+		    DbConnection.CloseConnection(con, preparedStatement,resultSet);
+		
+		return model;
 	}
 }

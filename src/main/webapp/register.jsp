@@ -18,6 +18,11 @@
 <jsp:setProperty property="*" name="user"/>
 	<div class="container">
 		<div class="row main align-items-center justify-content-center">
+			<c:if test="${ model.getMessageType() == 2  }" >
+				<div class="alert alert-danger col-8" role="alert">
+			  		<c:out value="${ model.getMessageName() }"></c:out>
+				</div>
+			</c:if>
 			<div class="col-8 col-lg-10 bx-shadow p-5 p-lg-0">
 			<div class="row align-items-center justify-content-between ">
 				<div class="col-10 col-lg-4 m-auto">

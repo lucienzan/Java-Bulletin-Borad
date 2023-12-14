@@ -38,90 +38,119 @@ public class User {
 	public String getId() {
 		return Id;
 	}
+	
 	public void setId(String id) {
 		Id = id;
 	}
+	
 	public String getFirstName() {
 		return FirstName;
 	}
+	
 	public void setFirstName(String firstName) {
 		FirstName = firstName;
 	}
+	
 	public String getLastName() {
 		return LastName;
 	}
+	
 	public void setLastName(String lastName) {
 		LastName = lastName;
 	}
+	
 	public String getEmail() {
 		return Email;
 	}
+	
 	public void setEmail(String email) {
 		Email = email;
 	}
+	
 	public String getPassword() {
 		return Password;
 	}
+	
 	public void setPassword(String password) {
 		Password = password;
 	}
+	
 	public String getConfirmPassword() {
 		return ConfirmPassword;
 	}
+	
 	public void setConfirmPassword(String confirmPassword) {
 		ConfirmPassword = confirmPassword;
 	}
+	
 	public String getPhone() {
 		return Phone;
 	}
+	
 	public void setPhone(String phone) {
 		Phone = phone;
 	}
+	
 	public Date getDOB() {
 		return DOB;
 	}
+	
 	public void setDOB(Date dOB) {
 		DOB = dOB;
 	}
+	
 	public String getCreatedUserId() {
 		return CreatedUserId;
 	}
+	
 	public void setCreatedUserId(String createdUserId) {
 		CreatedUserId = createdUserId;
 	}
+	
 	public Date getCreatedDate() {
 		return CreatedDate;
 	}
+	
 	public void setCreatedDate(Date createdDate) {
 		CreatedDate = createdDate;
 	}
+	
 	public String getUpdatedUserId() {
 		return UpdatedUserId;
 	}
+	
 	public void setUpdatedUserId(String updatedUserId) {
 		UpdatedUserId = updatedUserId;
 	}
+	
 	public Date getUpdatedDate() {
 		return UpdatedDate;
 	}
+	
 	public void setUpdatedDate(Date updatedDate) {
 		UpdatedDate = updatedDate;
 	}
+	
 	public String getDeletedUserId() {
 		return DeletedUserId;
 	}
+	
 	public void setDeletedUserId(String deletedUserId) {
 		DeletedUserId = deletedUserId;
 	}
+	
 	public Date getDeletedDate() {
 		return DeletedDate;
 	}
+	
 	public void setDeletedDate(Date deletedDate) {
 		DeletedDate = deletedDate;
 	}
+	
 	public boolean isDeletedFlag() {
 		return DeletedFlag;
 	}
+	
 	public void setDeletedFlag(boolean deletedFlag) {
 		DeletedFlag = deletedFlag;
 	}
