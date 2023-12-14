@@ -10,7 +10,8 @@
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 		rel="stylesheet"
 		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-		crossorigin="anonymous"></head>
+		crossorigin="anonymous">
+</head>
 <body>
 	<div class="container">
 		<div class="row main align-items-center justify-content-center">
@@ -18,7 +19,8 @@
 			<div class="row align-items-center justify-content-between ">
 				<div class="col-10 col-lg-4 m-auto">
 					<h3 class="text-center">Sign In</h3>
-					<form action="LoginController" method="post">
+					<form action="AccountController" method="post">
+						<input type="hidden" name="action" value="login">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
 							<input class="form-control" type="email" placeholder="email" required id="email" name="email">
