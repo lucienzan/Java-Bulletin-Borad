@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +34,7 @@
 						<input type="hidden" name="action" value="login">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
-							<input class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="" placeholder="email" required id="email" name="email">
+							<input class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="<%= user.getEmail() %>" placeholder="email" required id="email" name="email">
 							<c:if test="${requestScope.emailError != null}">
 								<div class="invalid-feedback">
 									<c:out value="${requestScope.emailError}" />

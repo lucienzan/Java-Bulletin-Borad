@@ -44,7 +44,7 @@ public class AccountController extends HttpServlet {
 		User user = new User();
 		boolean errorExist = this.Validation(request, response);
 		if(errorExist) {
-			request.getRequestDispatcher("/login.jsp").include(request, response);
+			request.getRequestDispatcher("login.jsp").include(request, response);
 		} else {
 			user.setEmail(request.getParameter("email"));
 			user.setPassword(request.getParameter("password"));
@@ -54,10 +54,10 @@ public class AccountController extends HttpServlet {
 				HttpSession session = request.getSession(true);
 				session.setAttribute("userManager", model.getUserModel());
 				session.setMaxInactiveInterval(30 * 60);
-				request.getRequestDispatcher("/index.jsp").forward(request, response);
+	    		response.sendRedirect(request.getContextPath()+"/Layout/index.jsp");
 			} else {
 				request.setAttribute("model", model);
-				request.getRequestDispatcher("/login.jsp").include(request, response);
+				request.getRequestDispatcher("login.jsp").include(request, response);
 			}
 		}
 	}
