@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.container {
+.main-container {
   height: 100vh;
 }
 
@@ -27,4 +27,8 @@
 
 .cc-tag:hover {
     text-decoration: underline !important ;
+}
+
+.navbar-expand-lg .navbar-nav .dropdown-menu {
+	left: -50px;
 }

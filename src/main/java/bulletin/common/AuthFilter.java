@@ -31,11 +31,16 @@ public class AuthFilter implements Filter {
 		boolean isLoggedIn = (session != null && session.getAttribute("userManager") != null);
 		String uri = httpRequest.getRequestURI();
 		String prefixToRemove = httpRequest.getContextPath().toString();
-	    String resultString = uri.replaceFirst("^" + prefixToRemove, "");
+		String resultString = uri.replaceFirst("^" + prefixToRemove, "");
+
 		if (isLoggedIn) {
-			httpRequest.getRequestDispatcher(resultString).forward(httpRequest, httpResponse);
+			if (!(uri.endsWith("login.jsp") || uri.endsWith("register.jsp") || uri.endsWith("AccountController"))) {
+				httpRequest.getRequestDispatcher(resultString).forward(httpRequest, httpResponse);
+			} else {
+				httpRequest.getRequestDispatcher("/Layout/index.jsp").forward(httpRequest, httpResponse);
+			}
 		} else {
-			// User is not logged in, redirect to the login page
+			// User is not logged in, redirect to the login page\
 			chain.doFilter(request, response);
 		}
 	}

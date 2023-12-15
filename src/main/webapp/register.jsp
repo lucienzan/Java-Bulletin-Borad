@@ -17,7 +17,7 @@
 <jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="user"/>
-	<div class="container">
+	<div class="container main-container">
 		<div class="row main align-items-center justify-content-center">
 			<c:if test="${ model.getMessageType() == 2  }" >
 				<div class="alert alert-danger col-8" role="alert">

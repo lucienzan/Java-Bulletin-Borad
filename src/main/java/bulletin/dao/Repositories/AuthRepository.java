@@ -91,10 +91,15 @@ public class AuthRepository implements IAuthRepository {
 				user.setEmail(resultSet.getString("Email"));
 				user.setFirstName(resultSet.getString("FirstName"));
 				user.setDeletedFlag(resultSet.getBoolean("DeleteFlag"));
+				user.setActive(resultSet.getBoolean("Active"));
 				
 				if(user.isDeletedFlag()) {
 					model.setMessageName(Message.AccountNotFound);
 					model.setMessageType(Message.EXIST);
+				}else if(!user.isActive())
+				{
+					model.setMessageName(Message.NotActive);
+					model.setMessageType(Message.FAIL);
 				}else {
 					boolean matched = BCrypt.checkpw(obj.getPassword(), resultSet.getString("Password"));
 					if(matched) {
@@ -102,7 +107,7 @@ public class AuthRepository implements IAuthRepository {
 						model.setMessageName(Message.LoginSuccess);
 						model.setMessageType(Message.SUCCESS);
 					}else {
-						model.setMessageName(Message.LoginFail);
+						model.setMessageName(Message.IsAccountMatch);
 						model.setMessageType(Message.FAIL);
 					}
 				}

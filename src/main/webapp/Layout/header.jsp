@@ -2,6 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,6 +13,7 @@
 		rel="stylesheet"
 		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
 		crossorigin="anonymous">
+<link rel="stylesheet" href="/BulletinOJT/assets/css/style.css">
 <body>
 <jsp:useBean id="userInfo" class="bulletin.models.User" scope="session"></jsp:useBean>
 <%
@@ -20,9 +22,10 @@
 		response.sendRedirect(request.getContextPath()+"/login.jsp");
 	}else{
 		userManager = (User) session.getAttribute("userManager");
+	    userInfo.setId(userManager.getId());
+	    userInfo.setFirstName(userManager.getFirstName());
 	}
 %>
-<jsp:setProperty property="id" name="userInfo" value="<% userManager.getId(); %>"/>
 <div class="container-fluid bg-dark">
 	<header class="container-fluid">
 	<nav class="container navbar navbar-expand-lg navbar-dark bg-dark">
@@ -34,13 +37,15 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#">User</a>
+    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>">User</a>
         </li>
+        
         <li class="nav-item">
-          <a class="nav-link" href="#">Post</a>
+          <a class="nav-link <%= request.getRequestURI().endsWith("post-list.jsp") ? "active" : "" %>" href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>">Post</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <%= userInfo.getFirstName() %>
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#">Profile</a></li>
@@ -48,7 +53,9 @@
             <li><hr class="dropdown-divider"></li>
             <li>
 				<form action="<%= request.getContextPath() + "/HomeController" %>" method="get">
-            		<button type="submit" class="border-none">Logout</button>
+            		<button type="submit" class="border-0 bg-transparent ps-3">
+            		  Logout
+            		</button>
             	</form>
             </li>
           </ul>

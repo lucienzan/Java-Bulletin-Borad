@@ -19,7 +19,7 @@
 <jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="user"/>
-	<div class="container">
+	<div class="container main-container">
 		<div class="row main align-items-center justify-content-center">
 			<c:if test="${ model.getMessageType() == 3 || model.getMessageType() == 2 }" >
 				<div class="alert alert-danger col-8" role="alert">
@@ -56,7 +56,7 @@
 						<button type="submit" class="btn btn-dark w-100 p-2">Log In</button>
 						<div class="text-center mt-4">
 							<span class="text-secondary">Don't have an account?</span>
-							<a href="/BulletinOJT/register.jsp"  class="cc-tag text-decoration-none text-dark">Sign Up</a>
+							<a href="/BulletinOJT/register.jsp" class="cc-tag text-decoration-none text-dark">Sign Up</a>
 						</div>
 					</form>
 				</div>

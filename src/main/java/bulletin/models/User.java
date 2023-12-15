@@ -27,6 +27,7 @@ public class User {
 	private String ConfirmPassword;
 	private String Phone;
 	private Date DOB;
+	private boolean Active;
 	private String CreatedUserId;
 	private Date CreatedDate;
 	private String UpdatedUserId;
@@ -153,5 +154,13 @@ public class User {
 	
 	public void setDeletedFlag(boolean deletedFlag) {
 		DeletedFlag = deletedFlag;
+	}
+
+	public boolean isActive() {
+		return Active;
+	}
+
+	public void setActive(boolean active) {
+		Active = active;
 	}
 }

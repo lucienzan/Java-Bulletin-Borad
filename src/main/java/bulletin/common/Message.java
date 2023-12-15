@@ -14,8 +14,10 @@ public class Message {
     // Error Messages
     public static String AccountExist = "Email has already used.";
     public static String AccountFail = "Failed to create.";
-    public static String LoginFail = "Email or password is incorrect.";
+    public static String IsAccountMatch = "Email or password is incorrect.";
     public static String AccountNotFound = "Account does not exist.";
+    public static String NotActive = "Account has not activated yet.";
+    public static String LoginFail = "Login Failed.";
 
     // Validation Messages
     // Account
