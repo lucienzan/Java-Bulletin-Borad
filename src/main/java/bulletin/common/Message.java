@@ -28,4 +28,8 @@ public class Message {
     public static String PasswordMatch = "Password and Confirm Password should be the same.";
     public static String FPassword = "Password's format is incorrect.";
     public static String FEmail = "Email's format is incorrect.";
+    public static String AccountDelete = "User account is deleted.";
+    
+    // SQL Error
+    public static String SError = "Either server or sql is failed.";
 }

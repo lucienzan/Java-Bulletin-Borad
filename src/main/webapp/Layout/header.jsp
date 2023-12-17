@@ -3,17 +3,21 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 </head>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="/BulletinOJT/assets/css/style.css">
 <link
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 		rel="stylesheet"
 		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
 		crossorigin="anonymous">
-<link rel="stylesheet" href="/BulletinOJT/assets/css/style.css">
+<link rel="shortcut icon" href="<%= request.getContextPath() + "/assets/img/img_favicon.png" %>" type="image/x-icon" sizes='16x16'>
 <body>
 <jsp:useBean id="userInfo" class="bulletin.models.User" scope="session"></jsp:useBean>
 <%
@@ -37,7 +41,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>">User</a>
+    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" onclick="userRoute(`<%= request.getContextPath() + "/UserController" %>`)">User</a>
         </li>
         
         <li class="nav-item">
@@ -66,3 +70,7 @@
 </nav>
 	</header>
 </div>
+<div class="container mt-4">
+	<div class="row justify-content-center align-items-center">
+		<div class="col-12 col-md-8 col-lg-10">
+		

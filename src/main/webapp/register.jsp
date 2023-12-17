@@ -12,7 +12,9 @@
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
 		rel="stylesheet"
 		integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-		crossorigin="anonymous"></head>
+		crossorigin="anonymous">
+<link rel="shortcut icon" href="<%= request.getContextPath() + "/assets/img/img_favicon.png" %>" type="image/x-icon" sizes='16x16'>		
+</head>
 <body>
 <jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
@@ -72,7 +74,7 @@
 					</form>
 				</div>
 				<div class="d-none d-lg-block col-lg-6 p-0">
-				<img alt="login photo" class="login-img w-100" src="http://localhost:8080/BulletinOJT/assets/img/img_gradient.png">
+				<img alt="login photo" class="login-img w-100" src="<%= request.getContextPath() + "/assets/img/img_gradient.png" %>">
 				</div>
 			</div>
 			</div>

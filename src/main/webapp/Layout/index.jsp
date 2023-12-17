@@ -1,6 +1,4 @@
 <%@ include file="/Layout/header.jsp" %>
-<title>Home</title>
-
-
-
+	<title>Bulletin Board</title>
+	<div id="content"></div>
 <%@ include file="/Layout/footer.jsp" %>

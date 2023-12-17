@@ -22,10 +22,13 @@ public class User {
 	private String Id;
 	private String FirstName;
 	private String LastName;
+	private String FullName;
 	private String Email;
 	private String Password;
 	private String ConfirmPassword;
+	private String Address;
 	private String Phone;
+	private String RoleId;
 	private Date DOB;
 	private boolean Active;
 	private String CreatedUserId;
@@ -60,6 +63,14 @@ public class User {
 		LastName = lastName;
 	}
 	
+	public String getFullName() {
+		return FullName;
+	}
+
+	public void setFullName(String fullName) {
+		FullName = fullName;
+	}
+	
 	public String getEmail() {
 		return Email;
 	}
@@ -90,6 +101,22 @@ public class User {
 	
 	public void setPhone(String phone) {
 		Phone = phone;
+	}
+	
+	public String getRoleId() {
+		return RoleId;
+	}
+
+	public void setRoleId(String roleId) {
+		RoleId = roleId;
+	}
+
+	public String getAddress() {
+		return Address;
+	}
+
+	public void setAddress(String address) {
+		Address = address;
 	}
 	
 	public Date getDOB() {
