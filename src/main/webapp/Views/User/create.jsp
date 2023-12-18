@@ -24,7 +24,7 @@
                     <div class="col-12 col-md-6 mb-3">
                         <label for="firstName" class="form-label">First Name</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="text" name="firstName" id="firstName" value="${ user.getFirstName() }" class="form-control rounded ${not empty requestScope.firstNameError ? 'is-invalid' : ''}" placeholder="John">
+                        <input required type="text" name="firstName" id="firstName" value="${ user.getFirstName() }" class="form-control rounded ${not empty requestScope.firstNameError ? 'is-invalid' : ''}" placeholder="John">
                     	<c:if test="${requestScope.firstNameError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.firstNameError}" />
@@ -50,7 +50,7 @@
                     <div class="col-12 col-md-6 mb-3">
                         <label for="email" class="form-label">Email</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="email" name="email" value="${ user.getEmail() }" class="form-control rounded ${not empty requestScope.emailError || model.getMessageType() == 3  ? 'is-invalid' : ''}" placeholder="name@example.com" id="email">
+                        <input required type="email" name="email" value="${ user.getEmail() }" class="form-control rounded ${not empty requestScope.emailError || model.getMessageType() == 3  ? 'is-invalid' : ''}" placeholder="name@example.com" id="email">
                     	<c:choose>
 								<c:when test="${requestScope.emailError != null}">
 									<div class="invalid-feedback">
@@ -69,7 +69,7 @@
                     <div class="col-12 col-md-6 mb-3">
                         <label for="password" class="form-label">Password</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="password" name="password" class="form-control rounded ${not empty requestScope.passwordError ? 'is-invalid' : ''}" placeholder="********" id="password">
+                        <input required type="password" name="password" class="form-control rounded ${not empty requestScope.passwordError ? 'is-invalid' : ''}" placeholder="********" id="password">
                    		<c:if test="${requestScope.passwordError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.passwordError}" />
@@ -79,7 +79,7 @@
                     <div class="col-12 col-md-6 mb-3">
                         <label for="cpassword" class="form-label">Confirm Password</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="password" name="cpassword" id="cpassword" class="form-control rounded ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" placeholder="********">
+                        <input required type="password" name="cpassword" id="cpassword" class="form-control rounded ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" placeholder="********">
                     	<c:if test="${requestScope.cpasswordError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.cpasswordError}" />
@@ -105,7 +105,8 @@
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="dob" class="form-label">Birthday Date</label>
-                        <input type="date" name="dob" id="dob" value="${param.dob}" class="form-control rounded ${not empty requestScope.dobError ? 'is-invalid' : ''}">
+                        <span class="text-danger fw-bold">*</span>
+                        <input type="date" required name="dob" id="dob" value="${param.dob}" class="form-control rounded ${not empty requestScope.dobError ? 'is-invalid' : ''}">
                         <c:if test="${requestScope.dobError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.dobError}" />
@@ -116,7 +117,7 @@
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="profile" class="form-label">Profile</label>
-                        <input type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile">
+                        <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile">
                         <c:if test="${requestScope.fileError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.fileError}" />

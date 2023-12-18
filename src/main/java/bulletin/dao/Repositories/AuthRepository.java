@@ -22,7 +22,7 @@ public class AuthRepository implements IAuthRepository {
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-		
+
 		try {
 			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ?";
 			preparedStatement = con.prepareStatement(sqlQuery);
@@ -40,14 +40,15 @@ public class AuthRepository implements IAuthRepository {
 			} else {
 				sqlQuery = "INSERT INTO user (Id,FirstName,Email,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
 				sqlQuery += "VALUES (?,?,?,?,?,?,?)";
+				String generatedSecuredPasswordHash = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
 
 				preparedStatement = con.prepareStatement(sqlQuery);
 				preparedStatement.setString(1, obj.getId());
 				preparedStatement.setString(2, obj.getFirstName());
 				preparedStatement.setString(3, obj.getEmail());
-				preparedStatement.setString(4, obj.getPassword());
+				preparedStatement.setString(4, generatedSecuredPasswordHash);
 				preparedStatement.setString(5, obj.getCreatedUserId());
-				preparedStatement.setDate(6, obj.getCreatedDate());
+				preparedStatement.setTimestamp(6, obj.getCreatedDate());
 				preparedStatement.setBoolean(7, false);
 
 				int result = preparedStatement.executeUpdate();
@@ -100,6 +101,7 @@ public class AuthRepository implements IAuthRepository {
 					model.setMessageName(Message.NotActive);
 					model.setMessageType(Message.FAIL);
 				}else {
+
 					boolean matched = BCrypt.checkpw(obj.getPassword(), resultSet.getString("Password"));
 					if(matched) {
 						model.setUserModel(user);

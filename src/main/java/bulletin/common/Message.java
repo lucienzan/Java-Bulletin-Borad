@@ -35,6 +35,7 @@ public class Message {
     public static String FPassword = "Password's format is incorrect.";
     public static String FEmail = "Email's format is incorrect.";
     public static String AccountDelete = "User account is deleted.";
+    public static String FileTypeError = "File's extension does not support.";
     
     // SQL Error
     public static String SError = "Either server or sql is failed.";

@@ -64,3 +64,12 @@
   div.dataTables_wrapper div.dataTables_length select {
     width: 68px !important;
   }
+  
+  .profileImg {
+    opacity: 1;
+    transition: .5s ease;
+    backface-visibility: hidden;
+    border-radius: 50%;
+    width: 200px;
+    height: 200px;
+ }

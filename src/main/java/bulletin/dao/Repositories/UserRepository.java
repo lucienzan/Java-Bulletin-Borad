@@ -1,12 +1,16 @@
 package bulletin.dao.Repositories;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-
 import bulletin.common.BCrypt;
 import bulletin.common.DbConnection;
 import bulletin.common.Message;
@@ -40,9 +44,9 @@ public class UserRepository implements IUserRepository {
 				user.setRoleId(resultSet.getString("Name"));
 				user.setAddress(resultSet.getString("Address"));
 				user.setPhone(resultSet.getString("Phone"));
-				user.setDOB(resultSet.getDate("DOB"));
+				user.setDOB(resultSet.getTimestamp("DOB"));
 				user.setActive(resultSet.getBoolean("Active"));
-				user.setCreatedDate(resultSet.getDate("CreatedDate"));
+				user.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
 				userList.add(user);
 			}
 
@@ -54,6 +58,36 @@ public class UserRepository implements IUserRepository {
 		return userList;
 	}
 
+	public User Get(String id) {
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		
+		User model = new User();
+		try {
+			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Id = ? AND user.DeleteFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
+				model.setFullName(resultSet.getString("FirstName") + " " + lastName);
+				model.setFirstName(resultSet.getString("FirstName"));
+				model.setLastName(lastName);
+				model.setEmail(resultSet.getString("Email"));
+				model.setProfile(resultSet.getString("Profile"));
+				model.setDOB(resultSet.getTimestamp("DOB"));
+				model.setPhone(resultSet.getString("Phone"));
+				model.setRoleId(resultSet.getString("Name"));
+				model.setAddress(resultSet.getString("Address"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return model;
+	}
+	
 	public ResponseModel Create(User obj) {
 		ResponseModel model = new ResponseModel();
 
@@ -61,7 +95,6 @@ public class UserRepository implements IUserRepository {
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-		System.out.println(obj.getPassword());
 		String password = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
 		List<Role> roleList = new ArrayList<Role>();
 
@@ -104,10 +137,10 @@ public class UserRepository implements IUserRepository {
 				preparedStatement.setString(7, obj.getProfile());
 				preparedStatement.setString(8, obj.getPhone());
 				preparedStatement.setString(9, obj.getRoleId());
-				preparedStatement.setDate(10, obj.getDOB());
+				preparedStatement.setTimestamp(10, obj.getDOB());
 				preparedStatement.setBoolean(11, true);
 				preparedStatement.setString(12, obj.getCreatedUserId());
-				preparedStatement.setDate(13, obj.getCreatedDate());
+				preparedStatement.setTimestamp(13, obj.getCreatedDate());
 				preparedStatement.setBoolean(14, false);
 
 				int result = preparedStatement.executeUpdate();
@@ -130,7 +163,7 @@ public class UserRepository implements IUserRepository {
 		return model;
 	}
 
-	public ResponseModel Delete(String id) {
+	public ResponseModel Delete(String id,String currentUser) {
 		ResponseModel model = new ResponseModel();
 		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
@@ -138,15 +171,40 @@ public class UserRepository implements IUserRepository {
 		ResultSet resultSet = null;
 
 		try {
-			sqlQuery = "UPDATE user SET DeleteFlag = ? WHERE Id = ? ";
+			sqlQuery = "SELECT * FROM user WHERE Id = ? ";
 			preparedStatement = con.prepareStatement(sqlQuery);
-			preparedStatement.setBoolean(1, true);
-			preparedStatement.setString(2, id);
+			preparedStatement.setString(1, id);
+			resultSet = preparedStatement.executeQuery();
+			
+			String fileName  = null;
+			while (resultSet.next()) {
+				fileName = resultSet.getString("Profile");
+			}
+			
+            Timestamp deleteDate = new Timestamp(System.currentTimeMillis());
+			sqlQuery = "UPDATE user SET Profile = ?, DeleteFlag = ?, DeletedUserId = ?, DeletedDate = ? WHERE Id = ? ";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, "user.png");
+			preparedStatement.setBoolean(2, true);
+			preparedStatement.setString(3, currentUser);
+			preparedStatement.setTimestamp(4, deleteDate);
+			preparedStatement.setString(5, id);
 
 			int result = preparedStatement.executeUpdate();
 			if (result == Message.SUCCESS) {
 				model.setMessageType(Message.SUCCESS);
 				model.setMessageName(Message.AccountDelete);
+				
+				if(fileName != null && fileName != "user.png") {
+					String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
+					
+		        	File fileUploadDirectory = new File(filePath + "\\" + fileName);
+		        	if(fileUploadDirectory.exists()) {
+		        		Path fileToDelete = Paths.get(filePath + "\\" + fileName);
+			            // Delete the file
+			            Files.delete(fileToDelete);
+		        	}
+				}
 			}
 
 		} catch (Exception e) {

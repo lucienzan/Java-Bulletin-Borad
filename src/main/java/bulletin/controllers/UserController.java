@@ -1,5 +1,6 @@
 package bulletin.controllers;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,7 +12,7 @@ import jakarta.servlet.http.Part;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -47,7 +48,6 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		String contentType = request.getContentType();
 		String url = request.getServletPath().toString();
-
 		try {
 			if (contentType == null && url.endsWith("UserController")) {
 				request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
@@ -55,10 +55,21 @@ public class UserController extends HttpServlet {
 				this.GetUserList(request, response);
 			} else if (url.endsWith("create")) {
 				this.GetUser(request, response);
+			} else if(url.endsWith("GetDetail")) {
+				this.GetUserDetail(request,response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void GetUserDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String id = request.getParameter("id");
+		User user = _userService.Get(id);
+		Gson gson = new GsonBuilder().serializeNulls().create();
+		String json = gson.toJson(user);
+		
+		response.getWriter().write(json);
 	}
 
 	private void GetUserList(HttpServletRequest request, HttpServletResponse response)
@@ -93,7 +104,7 @@ public class UserController extends HttpServlet {
      			 fileName = extractFileName(part);
      			 boolean isAllowExtension =  checkExtension(fileName);
      		     if(isAllowExtension == false) {
-     		    	request.setAttribute("fileError", "File extension does not support.");
+     		    	request.setAttribute("fileError", Message.FileTypeError);
      				this.GetUser(request, response);
      				return;
      		     }
@@ -117,25 +128,24 @@ public class UserController extends HttpServlet {
     			String profile = fileName;
 
     			UUID randomIdUuid = UUID.randomUUID();
-    			java.util.Date date = new java.util.Date();
-    			Date createdDate = new java.sql.Date(date.getTime());
-    			java.util.Date utilDate = parseDate(request.getParameter("dob"));
-    			Date dob = new Date(utilDate.getTime());
+	            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
     			String id = randomIdUuid.toString();
 
     			ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
     					profile, phone, roleId, dob, createdDate, user.getId()));
-    			String DIR = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
+    			ServletContext context = getServletContext();  
+    			String dir = context.getInitParameter("fileDir");  
     			
     			if(model.getMessageType() == Message.SUCCESS) {
     				
     		        if(!fileName.contentEquals("user.png")) {
-    		        	File fileUploadDirectory = new File(DIR);
+    		        	File fileUploadDirectory = new File(dir);
         		        if (!fileUploadDirectory.exists()) {
         		            fileUploadDirectory.mkdirs();
         		        }
         		        
-        		        String savePath = DIR + File.separator + fileName;
+        		        String savePath = dir + File.separator + fileName;
         		        part.write(savePath);
     		        }
     		        
@@ -164,10 +174,17 @@ public class UserController extends HttpServlet {
 	        return "";
 	    }
 	
-	private java.util.Date parseDate(String date) throws ParseException {
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-mm-dd");
-		return simpleDateFormat.parse(date);
-	}
+	private static Timestamp convertStringToTimestamp(String inputDateStr) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date parsedDate =  dateFormat.parse(inputDateStr);
+            return new Timestamp(parsedDate.getTime());
+            
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; 
+        }
+    }
 
 	private boolean Validation(HttpServletRequest request, HttpServletResponse response) {
 		boolean error = false;
@@ -286,7 +303,10 @@ public class UserController extends HttpServlet {
 
 			JSONObject jsonData = new JSONObject(requestBody.toString());
 			String userId = jsonData.getString("userId");
-			ResponseModel model = _userService.Delete(userId);
+     		HttpSession session = request.getSession(false);
+     		User user= (User) session.getAttribute("userManager");
+
+			ResponseModel model = _userService.Delete(userId,user.getId());
 
 			JSONObject jsonResponse = new JSONObject();
 			jsonResponse.put("status", model.getMessageType());

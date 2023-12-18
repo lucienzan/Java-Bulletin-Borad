@@ -19,13 +19,18 @@ public class UserService {
 		 return userList;
 	}
 	
+	public User Get(String id){
+		User model = _useRepository.Get(id);
+		return model;
+	}
+	
 	public ResponseModel Create(User obj){
 		ResponseModel model = _useRepository.Create(obj);
 		 return model;
 	}
 	
-	public ResponseModel Delete(String id){
-		ResponseModel model = _useRepository.Delete(id);
+	public ResponseModel Delete(String id,String userId){
+		ResponseModel model = _useRepository.Delete(id,userId);
 		 return model;
 	}
 }

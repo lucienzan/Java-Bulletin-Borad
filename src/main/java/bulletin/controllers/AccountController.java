@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.UUID;
-import bulletin.common.BCrypt;
 import bulletin.common.Message;
 import bulletin.dao.Repositories.AuthRepository;
 import bulletin.models.ResponseModel;
@@ -72,9 +72,7 @@ public class AccountController extends HttpServlet {
 			request.getRequestDispatcher("/register.jsp").include(request, response);
 		} else {
 			UUID randomIdUuid = UUID.randomUUID();
-			java.util.Date date = new java.util.Date();
-			java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-			String generatedSecuredPasswordHash = BCrypt.hashpw(request.getParameter("password"), BCrypt.gensalt(12));
+            Timestamp createDate = new Timestamp(System.currentTimeMillis());
 			String id = randomIdUuid.toString();
 			int getTarget = request.getParameter("email").toString().indexOf("@");
 			String firstName = request.getParameter("email").toString().substring(0, getTarget);
@@ -82,8 +80,8 @@ public class AccountController extends HttpServlet {
 			user.setId(id);
 			user.setFirstName(firstName);
 			user.setEmail(request.getParameter("email"));
-			user.setPassword(generatedSecuredPasswordHash);
-			user.setCreatedDate(sqlDate);
+			user.setPassword(request.getParameter("password"));
+			user.setCreatedDate(createDate);
 			user.setCreatedUserId(id);
 			ResponseModel model = _accountService.Register(user);
 			if (model.getMessageType() == Message.SUCCESS) {

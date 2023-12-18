@@ -1,6 +1,6 @@
 package bulletin.models;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class User {
 
@@ -21,7 +21,7 @@ public class User {
 	}
 
 	public User(String id, String firstName, String lastName, String email, String password, String address,
-			String profile, String phone, String role, Date dob, Date createdDate, String createdUserId) {
+			String profile, String phone, String role, Timestamp dob, Timestamp createdDate, String createdUserId) {
 		this.Id = id;
 		this.FirstName = firstName;
 		this.LastName = lastName;
@@ -46,15 +46,15 @@ public class User {
 	private String Address;
 	private String Phone;
 	private String RoleId;
-	private Date DOB;
+	private Timestamp DOB;
 	private String Profile;
 	private boolean Active;
 	private String CreatedUserId;
-	private Date CreatedDate;
+	private Timestamp CreatedDate;
 	private String UpdatedUserId;
-	private Date UpdatedDate;
+	private Timestamp UpdatedDate;
 	private String DeletedUserId;
-	private Date DeletedDate;
+	private Timestamp DeletedDate;
 	private boolean DeletedFlag;
 
 	public String getId() {
@@ -137,11 +137,11 @@ public class User {
 		Address = address;
 	}
 
-	public Date getDOB() {
+	public Timestamp getDOB() {
 		return DOB;
 	}
 
-	public void setDOB(Date dOB) {
+	public void setDOB(Timestamp dOB) {
 		DOB = dOB;
 	}
 
@@ -153,11 +153,11 @@ public class User {
 		CreatedUserId = createdUserId;
 	}
 
-	public Date getCreatedDate() {
+	public Timestamp getCreatedDate() {
 		return CreatedDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(Timestamp createdDate) {
 		CreatedDate = createdDate;
 	}
 
@@ -169,11 +169,11 @@ public class User {
 		UpdatedUserId = updatedUserId;
 	}
 
-	public Date getUpdatedDate() {
+	public Timestamp getUpdatedDate() {
 		return UpdatedDate;
 	}
 
-	public void setUpdatedDate(Date updatedDate) {
+	public void setUpdatedDate(Timestamp updatedDate) {
 		UpdatedDate = updatedDate;
 	}
 
@@ -185,11 +185,11 @@ public class User {
 		DeletedUserId = deletedUserId;
 	}
 
-	public Date getDeletedDate() {
+	public Timestamp getDeletedDate() {
 		return DeletedDate;
 	}
 
-	public void setDeletedDate(Date deletedDate) {
+	public void setDeletedDate(Timestamp deletedDate) {
 		DeletedDate = deletedDate;
 	}
 

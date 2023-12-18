@@ -3,6 +3,10 @@
   <welcome-file-list>
     <welcome-file>login.jsp</welcome-file>
   </welcome-file-list>
+  <context-param>  
+    <param-name>fileDir</param-name>  
+    <param-value>D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile</param-value>  
+  </context-param>  
   <servlet>
     <servlet-name>AccountController</servlet-name>
     <servlet-class>bulletin.controllers.AccountController</servlet-class>
@@ -22,6 +26,14 @@
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>*.png</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.jpg</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.jpeg</url-pattern>
   </servlet-mapping>
   <filter>
     <display-name>AuthFilter</display-name>

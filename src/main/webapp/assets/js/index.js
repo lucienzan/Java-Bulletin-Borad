@@ -136,6 +136,38 @@ function deleteConfirm(table, id, route) {
 	})
 }
 
+	//user detail
+	$("table tbody").on("click", "#detailUserBtn", function() {
+		let id = $(this).parent().parent().parent().siblings("input").val();
+		$.get("/BulletinOJT/UserController/GetDetail", { id: id }, function(data) {
+			let {
+				FullName,
+				Profile,
+				Address,
+				Email,
+				FirstName,
+				LastName,
+				Phone,
+				DOB,
+				Role
+			} = JSON.parse(data);
+			$("#modalTtl").text(`${FullName}` + " - information");
+			$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
+			$(".firstName").text(FirstName);
+			$(".lastName").text(LastName);
+			if (Role == "Admin") {
+				$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
+			} else {
+				$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
+			}
+			$(".address").text(Address == "" ? "Unknown" : Address);
+			$(".email").text(Email);
+			$(".phone").text(Phone == null ? "Unknown" : Phone);
+			$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
+			$("#exampleModal").modal("show");
+		});
+	});
+
 });
 
 function route(route) {
