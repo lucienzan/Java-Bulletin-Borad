@@ -2,7 +2,7 @@
 jQuery(document).ready(function($) {
 	$("#userList").DataTable({
 		"processing": true,
-		"serverSide": false,
+		"bDestroy": true,
 		"ajax": {
 			"url": "/BulletinOJT/UserController",
 			"type": "GET",
@@ -12,18 +12,18 @@ jQuery(document).ready(function($) {
 		},
 		"columns": [
 			{
-				"render": function(meta) {
+				"render": function(data, type, full, meta) {
 					return meta.row + meta.settings._iDisplayStart + 1;
 				}
 			},
 			{ "data": "FullName", "name": "FullName", "width": "20%" },
 			{ "data": "Email", "name": "Email", "width": "20%" },
 			{
-				"render": function(full) {
+				"render": function(data, type, full, meta)  {
 
 					var str = "";
 
-					if (full.Role == "Admin") {
+					if (full.RoleId == "Admin") {
 						str = "<span class='badge rounded-pill bg-primary'>Admin</span>";
 					} else if (full.Role == null) {
 						str = "<span class='badge rounded-pill bg-danger'>User</span>";
@@ -36,7 +36,7 @@ jQuery(document).ready(function($) {
 			},
 			{ "data": "Address", "name": "Address", "width": "20%" },
 			{
-				"render": function(full) {
+				"render": function(data, type, full, meta)  {
 					if (full.DOB != null) {
 						var date = formatDate(full.DOB);
 						return date;
@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
 
 			},
 			{
-				"render": function(full) {
+				"render": function(data, type, full, meta)  {
 
 					var str = "";
 
@@ -60,13 +60,13 @@ jQuery(document).ready(function($) {
 				}
 			},
 			{
-				"render": function(full) {
+				"render": function(data, type, full, meta)  {
 					var date = formatDate(full.CreatedDate);
 					return date;
 				}
 			},
 			{
-				render: function(full) {
+				render: function(data, type, full, meta)  {
 
 					var actionsDropdown = `
                     <div class="dropdown-center">
@@ -97,38 +97,8 @@ jQuery(document).ready(function($) {
 		let url = "/BulletinOJT/UserController";
 		deleteConfirm(table, userId, url);
 	});
-});
-
-function userRoute(route) {
-	jQuery(document).ready(function($) {
-		$.ajax({
-			url: route,
-			type: 'POST',
-			success: function(response) {
-				document.title = "Bulletin Board | User List";
-				window.history.pushState(" ", " ", route);
-				$('script').html("");
-				$('body').html(response);
-			},
-			error: function(error) {
-				console.error('Error:', error);
-			}
-		});
-	})
-}
-
-function formatDate(inputDate) {
-	const dateObj = new Date(inputDate);
-	const day = dateObj.getDate();
-	const month = dateObj.getMonth() + 1;
-	const year = dateObj.getFullYear();
-
-	const formattedDay = day < 10 ? '0' + day : day;
-
-	return `${formattedDay}/${month}/${year}`;
-}
-
-// Delete confirm pop up box
+	
+	// Delete confirm pop up box
 function deleteConfirm(table, id, route) {
 	Swal.fire({
 		title: 'Are you sure to delete?',
@@ -152,7 +122,9 @@ function deleteConfirm(table, id, route) {
 							'Your file has been deleted.',
 							'success'
 						)
-						table.ajax.reload();
+
+                        table.draw();
+						table.ajax.reload(null, false);
 						showToast("success", response.message);
 					}
 				},
@@ -163,6 +135,35 @@ function deleteConfirm(table, id, route) {
 		}
 	})
 }
+
+});
+
+function route(route) {
+	jQuery(document).ready(function($) {
+		$.ajax({
+			url: route,
+			type: 'GET',
+			success: function(response) {
+				window.history.pushState(" ", " ", route);
+				$('body').html(response);
+			},
+			error: function(error) {
+				console.error('Error:', error);
+			}
+		});
+	})
+}
+
+function formatDate(inputDate) {
+	const dateObj = new Date(inputDate);
+	const day = dateObj.getDate();
+	const month = dateObj.getMonth() + 1;
+	const year = dateObj.getFullYear();
+	const formattedDay = day < 10 ? '0' + day : day;
+
+	return `${formattedDay}/${month}/${year}`;
+}
+
 
 //toast
 function showToast(icon, mesg) {
@@ -182,3 +183,5 @@ function showToast(icon, mesg) {
 		title: mesg
 	})
 }
+
+

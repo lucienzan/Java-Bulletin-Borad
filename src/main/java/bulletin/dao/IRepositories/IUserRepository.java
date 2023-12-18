@@ -6,5 +6,6 @@ import bulletin.models.User;
 
 public interface IUserRepository {
 	public List<User> GetAll();
+	public ResponseModel Create(User obj);
 	public ResponseModel Delete(String id);
 }

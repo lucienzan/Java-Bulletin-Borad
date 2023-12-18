@@ -41,7 +41,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" onclick="userRoute(`<%= request.getContextPath() + "/UserController" %>`)">User</a>
+    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" onclick="route(`<%= request.getContextPath() + "/UserController" %>`)">User</a>
         </li>
         
         <li class="nav-item">

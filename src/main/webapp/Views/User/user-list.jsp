@@ -1,6 +1,10 @@
 <title>Bulletin Board | User List</title>
 <%@ include file="/Layout/header.jsp" %>
 		<div>
+		<div class="mb-3 d-flex justify-content-between align-items-center">
+			<h3>User List</h3>
+			<a class="btn btn-primary" href="<%= request.getContextPath()+"/UserController/create" %>">Create</a>
+		</div>
 		<table id="userList" class="table">
 			<thead>
 				<tr>
