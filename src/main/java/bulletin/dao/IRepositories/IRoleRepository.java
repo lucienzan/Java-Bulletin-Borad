@@ -1,8 +1,8 @@
 package bulletin.dao.IRepositories;
 
-import java.util.List;
 import bulletin.models.Role;
 
 public interface IRoleRepository {
-	public List<Role> GetAll();
+	public Role GetAll();
+	public Role Create(Role obj);
 }

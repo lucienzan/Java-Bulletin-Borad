@@ -1,6 +1,7 @@
 package bulletin.dao.Repositories;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,26 +66,42 @@ public class UserRepository implements IUserRepository {
 		ResultSet resultSet = null;
 		
 		User model = new User();
+		List<Role> roleList = new ArrayList<Role>();
+
 		try {
+			sqlQuery = "SELECT * FROM role WHERE DeletedFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				String roleId = resultSet.getString("Id");
+				String name = resultSet.getString("Name");
+				roleList.add(new Role(roleId,name));
+			}
+			
 			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Id = ? AND user.DeleteFlag = false";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, id);
 			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
+				model.setId(resultSet.getString("Id"));
 				model.setFullName(resultSet.getString("FirstName") + " " + lastName);
 				model.setFirstName(resultSet.getString("FirstName"));
 				model.setLastName(lastName);
 				model.setEmail(resultSet.getString("Email"));
 				model.setProfile(resultSet.getString("Profile"));
+				model.setOldProfile(resultSet.getString("Profile"));
 				model.setDOB(resultSet.getTimestamp("DOB"));
 				model.setPhone(resultSet.getString("Phone"));
-				model.setRoleId(resultSet.getString("Name"));
+				model.setRoleName(resultSet.getString("role.Name"));
+				model.setRoleId(resultSet.getString("role.Id"));
 				model.setAddress(resultSet.getString("Address"));
+				model.setRoleList(roleList);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		DbConnection.CloseConnection(con, preparedStatement, resultSet);
 		return model;
 	}
 	
@@ -163,6 +180,76 @@ public class UserRepository implements IUserRepository {
 		return model;
 	}
 
+	public ResponseModel Update(User obj) {
+		ResponseModel model = new ResponseModel();
+
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+
+		try {
+			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ? AND Id != ? AND DeleteFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, obj.getEmail());
+			preparedStatement.setString(2, obj.getId());
+
+			resultSet = preparedStatement.executeQuery();
+			resultSet.next();
+
+			int count = resultSet.getInt(1);
+			if (count > 0) {
+				
+				// Email already exists, handle accordingly
+				model.setMessageName(Message.AccountExist);
+				model.setMessageType(Message.EXIST);
+
+			} else {
+				
+				sqlQuery = "UPDATE user SET FirstName = ?, LastName = ?, Email = ?, Address = ?, Profile = ?, Phone = ?, RoleId = ?";
+				sqlQuery += ", DOB = ?, Active = ?, UpdatedUserId = ?, UpdatedDate = ?, DeleteFlag = ? WHERE Id = ?";
+				
+				if(!obj.getOldProfile().contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
+					DeleteFile(obj.getOldProfile());
+				}
+				
+				preparedStatement = con.prepareStatement(sqlQuery);
+				preparedStatement.setString(1, obj.getFirstName());
+				preparedStatement.setString(2, obj.getLastName());
+				preparedStatement.setString(3, obj.getEmail());
+				preparedStatement.setString(4, obj.getAddress());
+				if(!obj.getOldProfile().contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
+					preparedStatement.setString(5, obj.getProfile());
+				}else {
+					preparedStatement.setString(5, obj.getOldProfile());
+				}
+				preparedStatement.setString(6, obj.getPhone());
+				preparedStatement.setString(7, obj.getRoleId());
+				preparedStatement.setTimestamp(8, obj.getDOB());
+				preparedStatement.setBoolean(9, true);
+				preparedStatement.setString(10, obj.getUpdatedUserId());
+				preparedStatement.setTimestamp(11, obj.getUpdatedDate());
+				preparedStatement.setBoolean(12, false);
+				preparedStatement.setString(13, obj.getId());
+
+				int result = preparedStatement.executeUpdate();
+
+				if (result == Message.SUCCESS) {
+					model.setMessageName(Message.UpdateSuccess);
+					model.setMessageType(Message.SUCCESS);
+				}
+			}
+
+		} catch (SQLException | IOException e) {
+			model.setMessageName(Message.AccountFail);
+			model.setMessageType(Message.FAIL);
+			e.printStackTrace();
+		}
+		DbConnection.CloseConnection(con, preparedStatement, resultSet);
+
+		return model;
+	}
+	
 	public ResponseModel Delete(String id,String currentUser) {
 		ResponseModel model = new ResponseModel();
 		DbConnection.GetInstance();
@@ -195,16 +282,7 @@ public class UserRepository implements IUserRepository {
 				model.setMessageType(Message.SUCCESS);
 				model.setMessageName(Message.AccountDelete);
 				
-				if(fileName != null && fileName != "user.png") {
-					String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
-					
-		        	File fileUploadDirectory = new File(filePath + "\\" + fileName);
-		        	if(fileUploadDirectory.exists()) {
-		        		Path fileToDelete = Paths.get(filePath + "\\" + fileName);
-			            // Delete the file
-			            Files.delete(fileToDelete);
-		        	}
-				}
+				DeleteFile(fileName);
 			}
 
 		} catch (Exception e) {
@@ -215,5 +293,20 @@ public class UserRepository implements IUserRepository {
 
 		DbConnection.CloseConnection(con, preparedStatement, resultSet);
 		return model;
+	}
+	
+	private boolean DeleteFile(String fileName) throws IOException {
+		if(fileName != null && fileName != "user.png") {
+			String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
+			
+        	File fileUploadDirectory = new File(filePath + "\\" + fileName);
+        	if(fileUploadDirectory.exists()) {
+        		Path fileToDelete = Paths.get(filePath + "\\" + fileName);
+	            // Delete the file
+	            Files.delete(fileToDelete);
+	            return true;
+        	}
+		}
+		return false;
 	}
 }

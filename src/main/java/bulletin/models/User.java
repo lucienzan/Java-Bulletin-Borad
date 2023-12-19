@@ -1,6 +1,7 @@
 package bulletin.models;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class User {
 
@@ -20,6 +21,7 @@ public class User {
 		this.Password = password;
 	}
 
+	// Create
 	public User(String id, String firstName, String lastName, String email, String password, String address,
 			String profile, String phone, String role, Timestamp dob, Timestamp createdDate, String createdUserId) {
 		this.Id = id;
@@ -35,6 +37,23 @@ public class User {
 		this.CreatedDate = createdDate;
 		this.CreatedUserId = createdUserId;
 	}
+	
+	// Update
+	public User(String id, String firstName, String lastName, String email, String address,
+			String profile, String phone, String role, Timestamp dob, Timestamp updatedDate, String updatedUserId, String oldProfile) {
+		this.Id = id;
+		this.FirstName = firstName;
+		this.LastName = lastName;
+		this.Email = email;
+		this.Address = address;
+		this.Profile = profile;
+		this.OldProfile = oldProfile;
+		this.Phone = phone;
+		this.RoleId = role;
+		this.DOB = dob;
+		this.UpdatedDate = updatedDate;
+		this.UpdatedUserId = updatedUserId;
+	}
 
 	private String Id;
 	private String FirstName;
@@ -46,9 +65,12 @@ public class User {
 	private String Address;
 	private String Phone;
 	private String RoleId;
+	private String RoleName;
 	private Timestamp DOB;
 	private String Profile;
+	private String OldProfile;
 	private boolean Active;
+	private List<Role> RoleList;
 	private String CreatedUserId;
 	private Timestamp CreatedDate;
 	private String UpdatedUserId;
@@ -144,6 +166,38 @@ public class User {
 	public void setDOB(Timestamp dOB) {
 		DOB = dOB;
 	}
+	
+	public String getProfile() {
+		return Profile;
+	}
+
+	public void setProfile(String profile) {
+		Profile = profile;
+	}
+
+	public List<Role> getRoleList() {
+		return RoleList;
+	}
+
+	public void setRoleList(List<Role> roleList) {
+		RoleList = roleList;
+	}
+	
+	public String getRoleName() {
+		return RoleName;
+	}
+
+	public void setRoleName(String roleName) {
+		RoleName = roleName;
+	}
+
+	public String getOldProfile() {
+		return OldProfile;
+	}
+	
+	public void setOldProfile(String oldProfile) {
+		OldProfile = oldProfile;
+	}
 
 	public String getCreatedUserId() {
 		return CreatedUserId;
@@ -207,13 +261,5 @@ public class User {
 
 	public void setActive(boolean active) {
 		Active = active;
-	}
-
-	public String getProfile() {
-		return Profile;
-	}
-
-	public void setProfile(String profile) {
-		Profile = profile;
 	}
 }

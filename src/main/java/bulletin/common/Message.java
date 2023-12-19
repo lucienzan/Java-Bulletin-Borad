@@ -10,6 +10,7 @@ public class Message {
     // Success Messages
     public static String AccountSuccess = "Successfully created.";
     public static String LoginSuccess = "Successfully logined";
+    public static String UpdateSuccess = "Successfully updated.";
     
     // Error Messages
     public static String AccountExist = "Email has already used.";
@@ -27,7 +28,6 @@ public class Message {
     public static String RPassword = "Password filed is required.";
     public static String RCPassword = "Confirm Password filed is required.";
     public static String PasswordMatch = "Password and Confirm Password should be the same.";
-    public static String RRole = "Role field is required.";
     public static String LAddress = "Address words length less than 100.";
     public static String RPhone = "Phone field is required.";
     public static String FPhone = "Phone's format is incorrect.";
@@ -37,6 +37,11 @@ public class Message {
     public static String AccountDelete = "User account is deleted.";
     public static String FileTypeError = "File's extension does not support.";
     
+    // Role
+    public static String RRole = "Role field is required.";
+    public static String RoleExist = "Role's name has already added.";
+
+
     // SQL Error
     public static String SError = "Either server or sql is failed.";
 }

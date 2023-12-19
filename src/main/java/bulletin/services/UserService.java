@@ -29,6 +29,11 @@ public class UserService {
 		 return model;
 	}
 	
+	public ResponseModel Update(User obj){
+		ResponseModel model = _useRepository.Update(obj);
+		 return model;
+	}
+	
 	public ResponseModel Delete(String id,String userId){
 		ResponseModel model = _useRepository.Delete(id,userId);
 		 return model;

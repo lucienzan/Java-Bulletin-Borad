@@ -23,12 +23,12 @@ jQuery(document).ready(function($) {
 
 					var str = "";
 
-					if (full.RoleId == "Admin") {
-						str = "<span class='badge rounded-pill bg-primary'>Admin</span>";
-					} else if (full.Role == null) {
-						str = "<span class='badge rounded-pill bg-danger'>User</span>";
+					if (full.RoleId == "Admin" || full.RoleId == "admin") {
+						str = `<span class='badge rounded-pill bg-primary'>${full.RoleId}</span>`;
+					} else if (full.RoleId == "User" || full.RoleId == "user") {
+						str = `<span class='badge rounded-pill bg-danger'>${full.RoleId}</span>`;
 					} else {
-						str = "<span class='badge rounded-pill bg-danger'>User</span>";
+						str = `<span class='badge rounded-pill bg-danger'>${full.RoleId}</span>`;
 					}
 
 					return str;
@@ -76,7 +76,7 @@ jQuery(document).ready(function($) {
 					actionsDropdown += `
                     <ul class="dropdown-menu">
                     <li><a id='detailUserBtn' class='dropdown-item'>View</a></li>
-                    <li><a id='editUserBtn' class='dropdown-item'>Edit</a></li>
+                    <li><a href='/BulletinOJT/UserController/user-edit?userId=${full.Id}' id='editUserBtn' class='dropdown-item'>Edit</a></li>
                     <li><a id='deleteUserBtn' class='dropdown-item text-danger'>Delete</a></li>
                     </ul>
                     </div>`;
@@ -136,55 +136,44 @@ function deleteConfirm(table, id, route) {
 	})
 }
 
-	//user detail
-	$("table tbody").on("click", "#detailUserBtn", function() {
-		let id = $(this).parent().parent().parent().siblings("input").val();
-		$.get("/BulletinOJT/UserController/GetDetail", { id: id }, function(data) {
-			let {
-				FullName,
-				Profile,
-				Address,
-				Email,
-				FirstName,
-				LastName,
-				Phone,
-				DOB,
-				Role
-			} = JSON.parse(data);
-			$("#modalTtl").text(`${FullName}` + " - information");
-			$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
-			$(".firstName").text(FirstName);
-			$(".lastName").text(LastName);
-			if (Role == "Admin") {
-				$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
-			} else {
-				$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
-			}
-			$(".address").text(Address == "" ? "Unknown" : Address);
-			$(".email").text(Email);
-			$(".phone").text(Phone == null ? "Unknown" : Phone);
-			$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
-			$("#exampleModal").modal("show");
-		});
+//user detail
+$("table tbody").on("click", "#detailUserBtn", function() {
+	let id = $(this).parent().parent().parent().siblings("input").val();
+	$.get("/BulletinOJT/UserController/user-detail", { id: id }, function(data) {
+		let {
+			FullName,
+			Profile,
+			Address,
+			Email,
+			FirstName,
+			LastName,
+			Phone,
+			DOB,
+			RoleName
+		} = JSON.parse(data);
+		console.log(JSON.parse(data));
+		$("#modalTtl").text(`${FullName}` + " - information");
+		$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
+		$(".firstName").text(FirstName);
+		$(".lastName").text(LastName);
+		if (RoleName == "Admin") {
+			$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
+		} else {
+			$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
+		}
+		$(".address").text(Address == "" ? "Unknown" : Address);
+		$(".email").text(Email);
+		$(".phone").text(Phone == null ? "Unknown" : Phone);
+		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
+		$("#exampleModal").modal("show");
 	});
-
 });
 
-function route(route) {
-	jQuery(document).ready(function($) {
-		$.ajax({
-			url: route,
-			type: 'GET',
-			success: function(response) {
-				window.history.pushState(" ", " ", route);
-				$('body').html(response);
-			},
-			error: function(error) {
-				console.error('Error:', error);
-			}
-		});
-	})
-}
+$("#roleEdit").on("click",function(){
+	console.log("hello")
+})
+
+});
 
 function formatDate(inputDate) {
 	const dateObj = new Date(inputDate);
@@ -195,7 +184,6 @@ function formatDate(inputDate) {
 
 	return `${formattedDay}/${month}/${year}`;
 }
-
 
 //toast
 function showToast(icon, mesg) {

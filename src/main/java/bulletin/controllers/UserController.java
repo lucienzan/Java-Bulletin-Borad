@@ -53,10 +53,12 @@ public class UserController extends HttpServlet {
 				request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
 			} else if (contentType != null && url.endsWith("UserController")) {
 				this.GetUserList(request, response);
-			} else if (url.endsWith("create")) {
+			} else if (url.endsWith("user-create")) {
 				this.GetUser(request, response);
-			} else if(url.endsWith("GetDetail")) {
+			} else if(url.endsWith("user-detail")) {
 				this.GetUserDetail(request,response);
+			} else if(url.endsWith("user-edit")) {
+				this.EditUser(request,response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,16 +87,39 @@ public class UserController extends HttpServlet {
 
 	private void GetUser(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		List<Role> roleList = _roleService.GetAll();
+		Role role = _roleService.GetAll();
+		List<Role> roleList = role.getRoleList();
 		ResponseModel model = new ResponseModel();
 		model.setRoles(roleList);
 		request.setAttribute("model", model);
 		request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
 	}
 	
+	private void EditUser(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			String userId = request.getParameter("userId");
+			User model = _userService.Get(userId);
+			model.setProfile("");
+			
+			request.setAttribute("userModel", model);
+			request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-        try {
+		String url = request.getServletPath().toString(); 
+		if(url.endsWith("updateUser")) {
+			this.UpdateUser(request, response);
+		}else {
+			this.CreateUser(request,response);
+		}
+	}
+	
+	private void CreateUser(HttpServletRequest request, HttpServletResponse response) {
+		try {
             response.setContentType("text/html;charset=UTF-8");
             
         	 Part part = request.getPart("profile");
@@ -154,6 +179,80 @@ public class UserController extends HttpServlet {
     			}else {
     				request.setAttribute("model", model);
     				request.getRequestDispatcher("/Views/User/create.jsp").include(request, response); 
+    			}
+    		}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	private void UpdateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+            response.setContentType("text/html;charset=UTF-8");
+            
+        	 Part part = request.getPart("profile");
+             String fileName = "user.png";
+             
+ 			String id = request.getParameter("id");
+ 			User userModel = _userService.Get(id);
+ 			userModel.setProfile("");
+             
+     		if(part != null && part.getSize() > 0) {
+     			 fileName = extractFileName(part);
+     			 boolean isAllowExtension =  checkExtension(fileName);
+     		     if(isAllowExtension == false) {
+     		    	request.setAttribute("fileError", Message.FileTypeError);
+     	 			request.setAttribute("userModel", userModel);
+     		    	request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+     		    	return;
+     		     }
+     		}
+     		
+     		boolean errorExist = this.Validation(request, response);
+     		
+     		HttpSession session = request.getSession(false);
+     		User user= (User) session.getAttribute("userManager");
+
+    		if (errorExist) {
+ 	 			request.setAttribute("userModel", userModel);
+ 		    	request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+    		} else {
+    			String email = request.getParameter("email");
+    			String firstName = request.getParameter("firstName");
+    			String lastName = request.getParameter("lastName");
+    			String roleId = request.getParameter("roleId");
+    			String address = request.getParameter("address");
+    			String phone = request.getParameter("phone");
+    			String oldProfile = request.getParameter("oldProfile");
+     			String profile = fileName;
+
+	            Timestamp updateDate = new Timestamp(System.currentTimeMillis());
+    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+
+    			ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address,
+    					profile, phone, roleId, dob, updateDate, user.getId(), oldProfile));
+    			ServletContext context = getServletContext();  
+    			String dir = context.getInitParameter("fileDir");  
+    			
+    			if(model.getMessageType() == Message.SUCCESS) {
+    				
+    		        if(!fileName.contentEquals("user.png")) {
+    		        	File fileUploadDirectory = new File(dir);
+        		        if (!fileUploadDirectory.exists()) {
+        		            fileUploadDirectory.mkdirs();
+        		        }
+        		        
+        		        String savePath = dir + File.separator + fileName;
+        		        part.write(savePath);
+    		        }
+    		        
+    		        request.setAttribute("model", model);
+     	 			request.setAttribute("userModel", userModel);
+    				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response); 
+    			}else {
+    				request.setAttribute("model", model);
+     	 			request.setAttribute("userModel", userModel);
+    				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response); 
     			}
     		}
 		} catch (Exception e) {

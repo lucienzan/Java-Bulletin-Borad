@@ -41,7 +41,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page" onclick="route(`<%= request.getContextPath() + "/UserController" %>`)">User</a>
+    		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page"  href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>" >User</a>
         </li>
         
         <li class="nav-item">
@@ -53,7 +53,7 @@
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Role</a></li>
+            <li><a class="dropdown-item" href="<%= request.getContextPath() + "/RoleController" %>">Role</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
 				<form action="<%= request.getContextPath() + "/HomeController" %>" method="get">
