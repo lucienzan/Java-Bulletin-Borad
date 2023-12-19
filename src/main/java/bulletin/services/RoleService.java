@@ -1,5 +1,4 @@
 package bulletin.services;
-import java.util.List;
 import bulletin.dao.IRepositories.IRoleRepository;
 import bulletin.dao.Repositories.RoleRepository;
 import bulletin.models.ResponseModel;
@@ -19,6 +18,11 @@ public class RoleService {
 	
 	public Role Create(Role obj){
 		Role model = _roleRepository.Create(obj);
+		return model;
+	}
+	
+	public ResponseModel Delete(Role obj) {
+		ResponseModel model = _roleRepository.Delete(obj);
 		return model;
 	}
 }

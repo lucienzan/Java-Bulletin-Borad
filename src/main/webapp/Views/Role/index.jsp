@@ -36,8 +36,8 @@
 								</c:otherwise>
 						</c:choose>
                    </div>
-                  <div class="col-4 mt-lg-1 d-flex justify-content-center align-items-center">
-                   	<button type="submit" class="btn btn-primary me-4" id="roleBtn">Create</button>
+                   <div class="mt-3">
+                   	<button type="submit" class="btn btn-primary me-2" id="roleBtn">Create</button>
                     <a class="btn btn-secondary" href="<%= request.getContextPath()+"/RoleController"%>">Cancel</a>
                 </div>
         		</div>
@@ -61,7 +61,7 @@
 							<td class="text-center">
 							<a href="edit?id=<c:out value='${role.getId()}' />"
 								class="btn btn-warning" id="roleEdit">Edit</a> 
-							<a href="delete?id=<c:out value='${role.getId()}' />"
+							<a onclick="roleDelBtn(`${role.getId()}`)"
 							class="btn btn-danger">Delete</a>
 							</td>
 							</tr>

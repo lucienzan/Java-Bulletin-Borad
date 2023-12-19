@@ -11,6 +11,7 @@ public class Message {
     public static String AccountSuccess = "Successfully created.";
     public static String LoginSuccess = "Successfully logined";
     public static String UpdateSuccess = "Successfully updated.";
+    public static String DeleteSuccess = "Successfully deleted.";
     
     // Error Messages
     public static String AccountExist = "Email has already used.";

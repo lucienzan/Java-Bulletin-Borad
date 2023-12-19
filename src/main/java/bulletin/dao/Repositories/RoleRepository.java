@@ -115,5 +115,33 @@ public class RoleRepository implements IRoleRepository {
 		return role;
 	}
 
-	
+	public ResponseModel Delete(Role obj) {
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResponseModel model = new ResponseModel();
+		
+		try {
+			sqlQuery = "UPDATE role SET DeletedUserId = ? , DeletedDate = ?, DeletedFlag = ? WHERE Id = ?";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, obj.getDeletedUserId());
+			preparedStatement.setTimestamp(2, obj.getDeletedDate());
+			preparedStatement.setBoolean(3, obj.isDeletedFlag());
+			preparedStatement.setString(4, obj.getId());
+			
+			int result = preparedStatement.executeUpdate();
+			if (result == Message.SUCCESS) {
+				model.setMessageType(Message.SUCCESS);
+				model.setMessageName(Message.DeleteSuccess);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.setMessageName(Message.SError);
+			model.setMessageType(Message.FAIL);
+		}
+		
+		DbConnection.CloseConnection(con, preparedStatement);
+		return model;
+	}
 }

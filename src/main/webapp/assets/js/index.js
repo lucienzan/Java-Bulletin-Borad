@@ -175,6 +175,44 @@ $("#roleEdit").on("click",function(){
 
 });
 
+function roleDelBtn(id) {
+	jQuery(document).ready(function($) {	
+	Swal.fire({
+		title: 'Are you sure to delete?',
+		text: "You won't be able to revert this!",
+		icon: 'warning',
+		showCancelButton: true,
+		confirmButtonColor: '#3085d6',
+		cancelButtonColor: '#d33',
+		confirmButtonText: 'Yes, delete it!'
+	}).then((result) => {
+		if (result.isConfirmed) {
+			$.ajax({
+				url: "/BulletinOJT/RoleController",
+				type: "DELETE",
+				data: JSON.stringify({ id: id }),
+				contentType: "application/json",
+				success: function(response) {
+					if (response.status == 1) {
+						Swal.fire(
+							'Deleted!',
+							'Your file has been deleted.',
+							'success'
+						)
+						showToast("success", response.message);
+						location.reload();
+					}
+				},
+				error: function(error) {
+					console.error("Error:", error);
+				}
+			});
+		}
+	})
+})
+}
+
+
 function formatDate(inputDate) {
 	const dateObj = new Date(inputDate);
 	const day = dateObj.getDate();

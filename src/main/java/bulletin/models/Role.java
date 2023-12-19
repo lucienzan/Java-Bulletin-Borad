@@ -23,6 +23,13 @@ public class Role {
 		Name = name;
 	}
 	
+	public Role(String id, Timestamp delDate, String delUserId, Boolean flag) {
+		Id = id;
+		DeletedDate = delDate;
+		DeletedUserId = delUserId;
+		DeletedFlag = flag;
+	}
+	
 	public String getId() {
 		return Id;
 	}
