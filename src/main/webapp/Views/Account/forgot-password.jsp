@@ -9,7 +9,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sign in</title>
+<title>Forgot Password</title>
 <link rel="stylesheet" href="/BulletinOJT/assets/css/style.css">
 <link
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -24,22 +24,25 @@
 <jsp:setProperty property="*" name="user"/>
 	<div class="container main-container">
 		<div class="row main align-items-center justify-content-center">
-			<c:if test="${ model.getMessageType() == 3 || model.getMessageType() == 2 }" >
-				<div class="alert alert-danger col-8" role="alert">
-			  		<c:out value="${ model.getMessageName() }"></c:out>
-				</div>
-			</c:if>
-			<c:if test="${ model.getMessageType() == 1 }" >
-				<div class="alert alert-success col-8" role="alert">
-			  		<c:out value="${ model.getMessageName() }"></c:out>
-				</div>
-			</c:if>
+			<c:choose>
+				<c:when test="${ model.getMessageType() == 3 || model.getMessageType() == 2 }">
+					<div class="alert alert-danger col-8" role="alert">
+				  		<c:out value="${ model.getMessageName() }"></c:out>
+					</div>
+				</c:when>
+				<c:when test="${ model.getMessageType() == 1 }">
+					<div class="alert alert-success col-8" role="alert">
+				  		<c:out value="${ model.getMessageName() }"></c:out>
+					</div>
+				</c:when>
+			</c:choose>
 			<div class="col-8 col-lg-10 bx-shadow p-5 p-lg-0">
 			<div class="row align-items-center justify-content-between ">
 				<div class="col-10 col-lg-4 m-auto">
-					<h3 class="text-center">Sign In</h3>
-					<form action="AccountController" method="post">
-						<input type="hidden" name="action" value="login">
+					<h3 class="text-center">Forgot Password</h3>
+					<p class="text-secondary text-center">No worries, we'll send you reset instructions.</p>
+					<form action="<%= request.getContextPath() + "/AccountController" %>" method="post">
+						<input type="hidden" name="action" value="forgotPwd">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
 							<input class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="<%= user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
@@ -49,22 +52,9 @@
 								</div>
 							</c:if>					
 						</div>
-						<div class="form-group mb-3">
-							<div class="d-flex justify-content-between">
-							<label class="form-label" for="password">Password</label> 
-							<a href="<%= request.getContextPath() + "/Views/Account/forgot-password.jsp" %>" class="text-decoration-none text-dark">Forgot your password?</a>
-							</div>
-							<input class="form-control ${not empty requestScope.passwordError ? 'is-invalid' : ''}" type="password" placeholder="password" required id="password" name="password">
-							<c:if test="${requestScope.passwordError != null}">
-								<div class="invalid-feedback">
-									<c:out value="${requestScope.passwordError}" />
-								</div>
-							</c:if>	
-						</div>
-						<button type="submit" class="btn btn-dark w-100 p-2">Log In</button>
+						<button type="submit" class="btn btn-dark w-100 p-2">Send</button>
 						<div class="text-center mt-4">
-							<span class="text-secondary">Don't have an account?</span>
-							<a href="/BulletinOJT/register.jsp" class="cc-tag text-decoration-none text-dark">Sign Up</a>
+							<a href="/BulletinOJT/login.jsp" class="cc-tag text-decoration-none text-dark">Back to login?</a>
 						</div>
 					</form>
 				</div>

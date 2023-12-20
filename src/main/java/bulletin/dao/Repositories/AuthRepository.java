@@ -160,7 +160,66 @@ public class AuthRepository implements IAuthRepository {
 			model.setMessageType(Message.FAIL);
 			model.setMessageName(Message.SError);
 		}
+		DbConnection.CloseConnection(con, preparedStatement, resultSet);	
+		return model;
+	}
+
+	public ResponseModel CheckEmail(String mail) {
+		ResponseModel model = new ResponseModel();		
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
 		
+		try {
+			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ? AND DeleteFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, mail);
+			resultSet = preparedStatement.executeQuery();
+			resultSet.next();
+			
+			int count = resultSet.getInt(1);
+			if (count == 0) {
+				model.setMessageName(Message.AccountNotFound);
+				model.setMessageType(Message.FAIL);
+			}else {
+				model.setMessageName(Message.SendSuccess);
+				model.setMessageType(Message.SUCCESS);
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			model.setMessageType(Message.FAIL);
+			model.setMessageName(Message.SError);
+		}
+		DbConnection.CloseConnection(con, preparedStatement, resultSet);
+		return model;
+	}
+
+	public ResponseModel ResetPassword(String mail,String passwrod) {
+		ResponseModel model = new ResponseModel();		
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		
+		try {
+			String hashPwd =BCrypt.hashpw(passwrod, BCrypt.gensalt(12));
+			sqlQuery = "UPDATE user SET Password = ? WHERE Email = ?";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, hashPwd);
+			preparedStatement.setString(2, mail);
+			preparedStatement.executeUpdate();
+			
+			model.setMessageType(Message.SUCCESS);
+			model.setMessageName(Message.UpdateSuccess);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.setMessageType(Message.FAIL);
+			model.setMessageName(Message.SError);
+		}
+		DbConnection.CloseConnection(con, preparedStatement);
 		return model;
 	}
 }

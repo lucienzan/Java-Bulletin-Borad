@@ -27,4 +27,15 @@ public class AccountService {
 		ResponseModel model = _authRepository.ChangePassword(obj);
 		 return model;
 	}
+	
+	public ResponseModel CheckEmail(String email) {
+		ResponseModel model = _authRepository.CheckEmail(email);
+		 return model;
+	}
+	
+	public ResponseModel ResetPassword(String email, String password) {
+		ResponseModel model = _authRepository.ResetPassword(email,password);
+		 return model;
+	}
+	
 }

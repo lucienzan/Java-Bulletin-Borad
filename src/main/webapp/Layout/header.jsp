@@ -29,6 +29,7 @@
 	    userInfo.setId(userManager.getId());
 	    userInfo.setFirstName(userManager.getFirstName());
 	}
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HTTP 1.1
 %>
 <div class="container-fluid bg-dark">
 	<header class="container-fluid">

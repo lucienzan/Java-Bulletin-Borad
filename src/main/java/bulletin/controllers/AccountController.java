@@ -1,12 +1,25 @@
 package bulletin.controllers;
 
+import jakarta.mail.Authenticator;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Properties;
 import java.util.UUID;
 import bulletin.common.Message;
 import bulletin.dao.Repositories.AuthRepository;
@@ -33,10 +46,14 @@ public class AccountController extends HttpServlet {
 		String action = request.getParameter("action");
 		if (action.contentEquals("login")) {
 			Login(request, response);
-		} else if(action.contentEquals("register")){
+		} else if (action.contentEquals("register")) {
 			Register(request, response);
-		} else if(action.contentEquals("changePwd")){
-			ChangePassword(request,response);
+		} else if (action.contentEquals("changePwd")) {
+			ChangePassword(request, response);
+		} else if (action.contentEquals("forgotPwd")) {
+			ForgotPassword(request, response);
+		} else if (action.contentEquals("resetPwd")) {
+			ResetPassword(request, response);
 		}
 	}
 
@@ -44,18 +61,18 @@ public class AccountController extends HttpServlet {
 
 		User user = new User();
 		boolean errorExist = this.Validation(request, response);
-		if(errorExist) {
+		if (errorExist) {
 			request.getRequestDispatcher("login.jsp").include(request, response);
 		} else {
 			user.setEmail(request.getParameter("email"));
 			user.setPassword(request.getParameter("password"));
-			
+
 			ResponseModel model = _accountService.Login(user);
-			if(model.getMessageType() == Message.SUCCESS) {
+			if (model.getMessageType() == Message.SUCCESS) {
 				HttpSession session = request.getSession(true);
 				session.setAttribute("userManager", model.getUserModel());
 				session.setMaxInactiveInterval(30 * 60);
-	    		response.sendRedirect(request.getContextPath()+"/Layout/index.jsp");
+				response.sendRedirect(request.getContextPath() + "/Layout/index.jsp");
 			} else {
 				request.setAttribute("model", model);
 				request.getRequestDispatcher("login.jsp").include(request, response);
@@ -73,7 +90,7 @@ public class AccountController extends HttpServlet {
 			request.getRequestDispatcher("/register.jsp").include(request, response);
 		} else {
 			UUID randomIdUuid = UUID.randomUUID();
-            Timestamp createDate = new Timestamp(System.currentTimeMillis());
+			Timestamp createDate = new Timestamp(System.currentTimeMillis());
 			String id = randomIdUuid.toString();
 			int getTarget = request.getParameter("email").toString().indexOf("@");
 			String firstName = request.getParameter("email").toString().substring(0, getTarget);
@@ -94,25 +111,117 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private void ChangePassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void ChangePassword(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		boolean errorExist = this.Validation(request, response);
-		if(errorExist) {
+		if (errorExist) {
 			request.getRequestDispatcher("/Views/Account/change-password.jsp").include(request, response);
 		} else {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute("userManager");
-			
+
 			User userModel = new User();
 			userModel.setId(user.getId());
 			userModel.setOldPassword(request.getParameter("opassword"));
 			userModel.setPassword(request.getParameter("password"));
-			
+
 			ResponseModel model = _accountService.ChangePassword(userModel);
 			request.setAttribute("model", model);
 			request.getRequestDispatcher("/Views/Account/change-password.jsp").forward(request, response);
 		}
 	}
-	
+
+	private void ForgotPassword(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		boolean errorExist = this.Validation(request, response);
+		if (errorExist) {
+			request.getRequestDispatcher("/Views/Account/forgot-password.jsp").include(request, response);
+		} else {
+			String email = request.getParameter("email");
+			ResponseModel model = _accountService.CheckEmail(email);
+			if (model.getMessageType() == Message.FAIL) {
+				request.setAttribute("model", model);
+				request.getRequestDispatcher("/Views/Account/forgot-password.jsp").include(request, response);
+				return;
+			} else {
+				String to = email;
+				String from = "bulletinBoradTeam@gmail.com";
+				final String username = "b175e99d9a1a8e";
+				final String password = "f40868ff58681c";
+				String host = "smtp.mailtrap.io";
+				Properties props = new Properties();
+				props.put("mail.smtp.auth", "true");
+				props.put("mail.smtp.starttls.enable", "true");
+				props.put("mail.smtp.host", host);
+				props.put("mail.smtp.port", "587");
+				Session session = Session.getInstance(props, new Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				});
+				try {
+					int index = email.indexOf("@gmail.com");
+					String name = email.substring(0, index);
+					ServletContext context = getServletContext();
+					String dir = context.getInitParameter("templateDir");
+					String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
+					String fileContent = ReadFile(dir);
+					String mailBody = fileContent.replace("#name#", name)
+							.replace("#route_link#", baseUrl + "/Views/Account/reset-password.jsp")
+							.replace("#home_route#", baseUrl + "/login.jsp");
+					jakarta.mail.Message message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(from));
+					message.setRecipients(jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(to));
+					message.setSubject("Testing Mailtrap");
+
+					MimeMultipart multipart = new MimeMultipart();
+					MimeBodyPart htmlPart = new MimeBodyPart();
+					htmlPart.setContent(mailBody, "text/html");
+					multipart.addBodyPart(htmlPart);
+					message.setContent(multipart);
+					Transport.send(message);
+
+					HttpSession resetSession = request.getSession(true);
+					resetSession.setAttribute("resetManager", email);
+					request.setAttribute("model", model);
+					request.getRequestDispatcher("/Views/Account/forgot-password.jsp").forward(request, response);
+				} catch (MessagingException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+	}
+
+	private void ResetPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		boolean errorExist = this.Validation(request, response);
+		if (errorExist) {
+			request.getRequestDispatcher("/Views/Account/reset-password.jsp").include(request, response);
+		} else {
+			HttpSession session = request.getSession(false);
+			String mail = (String) session.getAttribute("resetManager");
+			String password = request.getParameter("password");
+			ResponseModel model = _accountService.ResetPassword(mail,password);
+			
+			session.removeAttribute("resetManager");
+			session.invalidate();
+			request.setAttribute("model", model);
+			request.getRequestDispatcher("login.jsp").forward(request, response);
+		}
+	}
+
+	private String ReadFile(String filePath) {
+		StringBuilder sb = new StringBuilder();
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
+
 	private boolean Validation(HttpServletRequest request, HttpServletResponse response) {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
@@ -120,8 +229,9 @@ public class AccountController extends HttpServlet {
 		String password = request.getParameter("password");
 		String email = request.getParameter("email");
 
-		if(!request.getParameter("action").contentEquals("changePwd")) {
-		// email check
+		if (!request.getParameter("action").contentEquals("changePwd")
+				&& !request.getParameter("action").contentEquals("resetPwd")) {
+			// email check
 			if (email == null) {
 				request.setAttribute("emailError", Message.REmail);
 				error = true;
@@ -131,15 +241,19 @@ public class AccountController extends HttpServlet {
 			}
 		}
 
-		if (password == null) {
-			request.setAttribute("passwordError", Message.RPassword);
-			error = true;
-		} else if (!password.matches(passwordPattern)) {
-			request.setAttribute("passwordError", Message.FPassword);
-			error = true;
+		if (!request.getParameter("action").contentEquals("forgotPwd")) {
+			if (password == null) {
+				request.setAttribute("passwordError", Message.RPassword);
+				error = true;
+			} else if (!password.matches(passwordPattern)) {
+				request.setAttribute("passwordError", Message.FPassword);
+				error = true;
+			}
 		}
 
-		if (request.getParameter("action").contentEquals("register") || request.getParameter("action").contentEquals("changePwd")) {
+		if (request.getParameter("action").contentEquals("register")
+				|| request.getParameter("action").contentEquals("changePwd")
+				|| request.getParameter("action").contentEquals("resetPwd")) {
 			String cPassword = request.getParameter("cpassword");
 
 			// password check
@@ -151,10 +265,9 @@ public class AccountController extends HttpServlet {
 				error = true;
 			}
 		}
-		
+
 		if (request.getParameter("action").contentEquals("changePwd")) {
 			String oPassword = request.getParameter("opassword");
-
 			// old password check
 			if (oPassword.toString() == null) {
 				request.setAttribute("opasswordError", Message.ROPassword);

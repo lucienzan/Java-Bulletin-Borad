@@ -12,6 +12,7 @@ public class Message {
     public static String LoginSuccess = "Successfully logined";
     public static String UpdateSuccess = "Successfully updated.";
     public static String DeleteSuccess = "Successfully deleted.";
+    public static String SendSuccess = "Reset password link is successfully sent into your mail box.";
     
     // Error Messages
     public static String AccountExist = "Email has already used.";

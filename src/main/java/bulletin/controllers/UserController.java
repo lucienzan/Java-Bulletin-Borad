@@ -48,7 +48,6 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		String contentType = request.getContentType();
 		String url = request.getServletPath().toString();
-		System.out.println(url);
 		try {
 			if (contentType == null && url.endsWith("UserController")) {
 				request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
@@ -288,7 +287,6 @@ public class UserController extends HttpServlet {
 	        UUID uuid = UUID.randomUUID();
 	        for (String s : items) {
 	            if (s.trim().startsWith("filename")) {
-	            	System.out.println(s.indexOf("=") + 2);
 	                return "img_"+uuid+s.substring(s.indexOf("=") + 2, s.length() - 1);
 	            }
 	        }

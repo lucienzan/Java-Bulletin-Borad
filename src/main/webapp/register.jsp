@@ -1,7 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
+<%
+	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HTTP 1.1
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,7 +36,7 @@
 						<input type="hidden" name="action" value="register">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
-							<input class="form-control ${not empty requestScope.emailError || model.getMessageName() != null  ? 'is-invalid' : ''}" type="email" value="<%=user.getEmail() %>" placeholder="email" required id="email" name="email">
+							<input class="form-control ${not empty requestScope.emailError || model.getMessageName() != null  ? 'is-invalid' : ''}" type="email" value="<%=user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
 							<c:choose>
 								<c:when test="${requestScope.emailError != null}">
 									<div class="invalid-feedback">

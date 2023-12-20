@@ -7,6 +7,10 @@
     <param-name>fileDir</param-name>
     <param-value>D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile</param-value>
   </context-param>
+   <context-param>
+    <param-name>templateDir</param-name>
+    <param-value>D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\template\\reset.html</param-value>
+  </context-param>
   <servlet>
     <servlet-name>AccountController</servlet-name>
     <servlet-class>bulletin.controllers.AccountController</servlet-class>
