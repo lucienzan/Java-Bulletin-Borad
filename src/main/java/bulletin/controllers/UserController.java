@@ -48,6 +48,7 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		String contentType = request.getContentType();
 		String url = request.getServletPath().toString();
+		System.out.println(url);
 		try {
 			if (contentType == null && url.endsWith("UserController")) {
 				request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
@@ -59,6 +60,8 @@ public class UserController extends HttpServlet {
 				this.GetUserDetail(request,response);
 			} else if(url.endsWith("user-edit")) {
 				this.EditUser(request,response);
+			} else if(url.endsWith("profile")) {
+				this.Profile(request,response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -72,6 +75,13 @@ public class UserController extends HttpServlet {
 		String json = gson.toJson(user);
 		
 		response.getWriter().write(json);
+	}
+	
+	private void Profile(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		String id = request.getParameter("userId");
+		User user = _userService.Get(id);
+		request.setAttribute("userModel", user);
+		request.getRequestDispatcher("/Views/Account/profile.jsp").forward(request, response);
 	}
 
 	private void GetUserList(HttpServletRequest request, HttpServletResponse response)
@@ -194,8 +204,8 @@ public class UserController extends HttpServlet {
              String fileName = "user.png";
              
  			String id = request.getParameter("id");
+ 			String isProfileRoute = request.getParameter("isProfileRoute");
  			User userModel = _userService.Get(id);
- 			userModel.setProfile("");
              
      		if(part != null && part.getSize() > 0) {
      			 fileName = extractFileName(part);
@@ -203,7 +213,10 @@ public class UserController extends HttpServlet {
      		     if(isAllowExtension == false) {
      		    	request.setAttribute("fileError", Message.FileTypeError);
      	 			request.setAttribute("userModel", userModel);
-     		    	request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+     	 			if(!isProfileRoute.contentEquals("true"))
+     	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+     	 			else
+         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
      		    	return;
      		     }
      		}
@@ -215,7 +228,10 @@ public class UserController extends HttpServlet {
 
     		if (errorExist) {
  	 			request.setAttribute("userModel", userModel);
- 		    	request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+ 	 			if(isProfileRoute == null)
+ 	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+ 	 			else
+     		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     		} else {
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
@@ -248,11 +264,17 @@ public class UserController extends HttpServlet {
     		        
     		        request.setAttribute("model", model);
      	 			request.setAttribute("userModel", userModel);
-    				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response); 
+     	 			if(isProfileRoute == null)
+     	 				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
+     	 			else
+         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     			}else {
     				request.setAttribute("model", model);
      	 			request.setAttribute("userModel", userModel);
-    				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response); 
+     	 			if(isProfileRoute == null)
+     	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+     	 			else
+         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     			}
     		}
 		} catch (Exception e) {

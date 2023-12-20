@@ -28,14 +28,15 @@ public class AccountController extends HttpServlet {
 			throws ServletException, IOException {
 	}
 
-	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
 		if (action.contentEquals("login")) {
 			Login(request, response);
-		} else {
+		} else if(action.contentEquals("register")){
 			Register(request, response);
+		} else if(action.contentEquals("changePwd")){
+			ChangePassword(request,response);
 		}
 	}
 
@@ -93,6 +94,25 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
+	private void ChangePassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		boolean errorExist = this.Validation(request, response);
+		if(errorExist) {
+			request.getRequestDispatcher("/Views/Account/change-password.jsp").include(request, response);
+		} else {
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
+			
+			User userModel = new User();
+			userModel.setId(user.getId());
+			userModel.setOldPassword(request.getParameter("opassword"));
+			userModel.setPassword(request.getParameter("password"));
+			
+			ResponseModel model = _accountService.ChangePassword(userModel);
+			request.setAttribute("model", model);
+			request.getRequestDispatcher("/Views/Account/change-password.jsp").forward(request, response);
+		}
+	}
+	
 	private boolean Validation(HttpServletRequest request, HttpServletResponse response) {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
@@ -100,13 +120,15 @@ public class AccountController extends HttpServlet {
 		String password = request.getParameter("password");
 		String email = request.getParameter("email");
 
+		if(!request.getParameter("action").contentEquals("changePwd")) {
 		// email check
-		if (email == null) {
-			request.setAttribute("emailError", Message.REmail);
-			error = true;
-		} else if (!email.matches(emailPattern)) {
-			request.setAttribute("emailError", Message.FEmail);
-			error = true;
+			if (email == null) {
+				request.setAttribute("emailError", Message.REmail);
+				error = true;
+			} else if (!email.matches(emailPattern)) {
+				request.setAttribute("emailError", Message.FEmail);
+				error = true;
+			}
 		}
 
 		if (password == null) {
@@ -117,7 +139,7 @@ public class AccountController extends HttpServlet {
 			error = true;
 		}
 
-		if (request.getParameter("action").contentEquals("register")) {
+		if (request.getParameter("action").contentEquals("register") || request.getParameter("action").contentEquals("changePwd")) {
 			String cPassword = request.getParameter("cpassword");
 
 			// password check
@@ -128,6 +150,20 @@ public class AccountController extends HttpServlet {
 				request.setAttribute("cpasswordError", Message.PasswordMatch);
 				error = true;
 			}
+		}
+		
+		if (request.getParameter("action").contentEquals("changePwd")) {
+			String oPassword = request.getParameter("opassword");
+
+			// old password check
+			if (oPassword.toString() == null) {
+				request.setAttribute("opasswordError", Message.ROPassword);
+				error = true;
+			} else if (!oPassword.matches(passwordPattern)) {
+				request.setAttribute("opasswordError", Message.FPassword);
+				error = true;
+			}
+
 		}
 
 		return error;

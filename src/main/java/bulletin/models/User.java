@@ -62,6 +62,7 @@ public class User {
 	private String Email;
 	private String Password;
 	private String ConfirmPassword;
+	private String OldPassword;
 	private String Address;
 	private String Phone;
 	private String RoleId;
@@ -133,6 +134,14 @@ public class User {
 
 	public void setConfirmPassword(String confirmPassword) {
 		ConfirmPassword = confirmPassword;
+	}
+	
+	public String getOldPassword() {
+		return OldPassword;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		OldPassword = oldPassword;
 	}
 
 	public String getPhone() {

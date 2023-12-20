@@ -27,6 +27,7 @@ public class RoleController extends HttpServlet {
 			HttpSession session = request.getSession(false);
 			String editId = request.getParameter("editId");
 			String delId = request.getParameter("deleteId");
+			System.out.println(url);
 			
 			if(session == null) {
 		        request.getRequestDispatcher("/login.jsp").include(request, response);

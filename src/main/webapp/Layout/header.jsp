@@ -52,8 +52,8 @@
           <%= userInfo.getFirstName() %>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="<%= request.getContextPath() + "/RoleController" %>">Role</a></li>
+            <li><a class="dropdown-item" href="<%= request.getContextPath() + "/profile?userId=" + userInfo.getId() %>">Profile</a></li>
+            <li><a class="dropdown-item" href="<%= request.getContextPath() + "/Views/Account/change-password.jsp" %>">Change Password</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
 				<form action="<%= request.getContextPath() + "/HomeController" %>" method="get">

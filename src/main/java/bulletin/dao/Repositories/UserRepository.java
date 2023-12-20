@@ -32,7 +32,7 @@ public class UserRepository implements IUserRepository {
 
 		List<User> userList = new ArrayList<User>();
 		try {
-			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Active = true AND user.DeleteFlag = false OR role.DeletedFlag = false";
+			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Active = true AND user.DeleteFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
 
@@ -187,30 +187,38 @@ public class UserRepository implements IUserRepository {
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-
+		boolean isExist = false;
+		
 		try {
-			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ? AND Id != ? AND DeleteFlag = false";
+			sqlQuery = "SELECT * FROM user WHERE Email = ? AND Id != ? AND DeleteFlag = false";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
 			preparedStatement.setString(2, obj.getId());
-
 			resultSet = preparedStatement.executeQuery();
-			resultSet.next();
-
-			int count = resultSet.getInt(1);
-			if (count > 0) {
-				
-				// Email already exists, handle accordingly
-				model.setMessageName(Message.AccountExist);
-				model.setMessageType(Message.EXIST);
-
-			} else {
-				
+			
+			if(resultSet.next()) {
+				String count = resultSet.getString("Id");
+			    if (count.length() > 0) {
+			    	isExist = true;
+			    	model.setMessageName(Message.AccountExist);
+					model.setMessageType(Message.EXIST);
+			    }
+			};
+			
+			sqlQuery = "SELECT * FROM user WHERE Id = ? AND DeleteFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, obj.getId());
+			resultSet = preparedStatement.executeQuery();
+			String oldFile = null;
+			if(resultSet.next()) {
+				oldFile = resultSet.getString("Profile");
+			};
+			
+			if(isExist == false) {
 				sqlQuery = "UPDATE user SET FirstName = ?, LastName = ?, Email = ?, Address = ?, Profile = ?, Phone = ?, RoleId = ?";
 				sqlQuery += ", DOB = ?, Active = ?, UpdatedUserId = ?, UpdatedDate = ?, DeleteFlag = ? WHERE Id = ?";
-				
 				if(!obj.getOldProfile().contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
-					DeleteFile(obj.getOldProfile());
+					DeleteFile(oldFile);
 				}
 				
 				preparedStatement = con.prepareStatement(sqlQuery);
@@ -218,10 +226,10 @@ public class UserRepository implements IUserRepository {
 				preparedStatement.setString(2, obj.getLastName());
 				preparedStatement.setString(3, obj.getEmail());
 				preparedStatement.setString(4, obj.getAddress());
-				if(!obj.getOldProfile().contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
+				if(!oldFile.contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
 					preparedStatement.setString(5, obj.getProfile());
 				}else {
-					preparedStatement.setString(5, obj.getOldProfile());
+					preparedStatement.setString(5, oldFile);
 				}
 				preparedStatement.setString(6, obj.getPhone());
 				preparedStatement.setString(7, obj.getRoleId());

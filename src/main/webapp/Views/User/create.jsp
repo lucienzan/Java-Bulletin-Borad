@@ -104,7 +104,7 @@
 						</c:if>
                     </div>
                     <div class="col-12 col-md-6 mb-3">
-                        <label for="dob" class="form-label">Birthday Date</label>
+                        <label for="dob" class="form-label">Date Of Birth</label>
                         <span class="text-danger fw-bold">*</span>
                         <input type="date" required name="dob" id="dob" value="${param.dob}" class="form-control rounded ${not empty requestScope.dobError ? 'is-invalid' : ''}">
                         <c:if test="${requestScope.dobError != null}">

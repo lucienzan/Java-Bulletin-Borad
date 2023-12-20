@@ -34,7 +34,7 @@ public class AuthFilter implements Filter {
 		String resultString = uri.replaceFirst("^" + prefixToRemove, "");
 
 		if (isLoggedIn) {
-			if (!(uri.endsWith("login.jsp") || uri.endsWith("register.jsp") || uri.endsWith("AccountController") || uri.endsWith("/BulletinOJT/"))) {
+			if (!(uri.endsWith("login.jsp") || uri.endsWith("register.jsp") || uri.endsWith("/BulletinOJT/"))) {
 				httpRequest.getRequestDispatcher(resultString).forward(httpRequest, httpResponse);
 			} else {
 				httpRequest.getRequestDispatcher("/Layout/index.jsp").forward(httpRequest, httpResponse);

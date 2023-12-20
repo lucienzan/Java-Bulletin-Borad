@@ -22,4 +22,9 @@ public class AccountService {
 		ResponseModel model = _authRepository.Login(obj);
 		 return model;
 	}
+	
+	public ResponseModel ChangePassword(User obj) {
+		ResponseModel model = _authRepository.ChangePassword(obj);
+		 return model;
+	}
 }

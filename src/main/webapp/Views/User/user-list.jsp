@@ -13,7 +13,7 @@
                     <th>Email</th>
                     <th>Role</th>
                     <th>Address</th>
-                    <th>Birthday</th>
+                    <th>Date Of Birth</th>
                     <th>Active</th>
                     <th>Created At</th>
                     <th class="text-center">Actions</th>
@@ -34,31 +34,31 @@
                    </div>
                    <div class="row">
                        <div class="col-6">
-                            <span class="fw-bold">First Name : </span>
+                            <span class="fw-bold">First Name</span>
                             <p class="firstName"></p>
                        </div>
                        <div class="col-6">
-                           <span class="fw-bold">Last Name : </span>
+                           <span class="fw-bold">Last Name</span>
                             <p class="lastName"></p>
                        </div>
                        <div class="col-6">
-                            <span class="fw-bold">Role : </span>
+                            <span class="fw-bold">Role</span>
                             <p class="role"></p>
                        </div>
                        <div class="col-6">
-                            <span class="fw-bold">Email : </span>
+                            <span class="fw-bold">Email</span>
                             <p class="email"></p>
                        </div>
                         <div class="col-6">
-                            <span class="fw-bold ">Address : </span>
+                            <span class="fw-bold ">Address</span>
                             <p class="address"></p>
                         </div>
                         <div class="col-6">
-                            <span class="fw-bold ">Mobile : </span>
+                            <span class="fw-bold ">Mobile</span>
                             <p class="phone"></p>
                         </div>
                         <div class="col-6">
-                            <span class="fw-bold">Date Of Birth : </span>
+                            <span class="fw-bold">Date Of Birth</span>
                             <p class="dob"></p>
                         </div>
                    </div>

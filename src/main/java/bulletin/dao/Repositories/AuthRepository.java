@@ -122,4 +122,45 @@ public class AuthRepository implements IAuthRepository {
 		
 		return model;
 	}
+
+	public ResponseModel ChangePassword(User obj)
+	{
+		ResponseModel model = new ResponseModel();		
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		
+		try {
+			sqlQuery = "SELECT * FROM user WHERE ID = ? AND DeleteFlag = false";
+			preparedStatement = con.prepareStatement(sqlQuery);
+			preparedStatement.setString(1, obj.getId());
+			resultSet = preparedStatement.executeQuery();
+			boolean isVerify = false;
+			while (resultSet.next()) {
+				isVerify = BCrypt.checkpw(obj.getOldPassword(), resultSet.getString("Password"));
+			}
+			
+			if(isVerify == false) {
+				model.setMessageType(Message.EXIST);
+				model.setMessageName(Message.OPasswordMatch);
+			}else {
+				sqlQuery = "UPDATE user SET Password = ? WHERE ID = ? AND DeleteFlag = false";
+				preparedStatement = con.prepareStatement(sqlQuery);
+				String hashPwd = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
+				preparedStatement.setString(1, hashPwd);
+				preparedStatement.setString(2, obj.getId());				
+				preparedStatement.executeUpdate();
+				
+				model.setMessageType(Message.SUCCESS);
+				model.setMessageName(Message.UpdateSuccess);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.setMessageType(Message.FAIL);
+			model.setMessageName(Message.SError);
+		}
+		
+		return model;
+	}
 }

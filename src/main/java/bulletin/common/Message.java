@@ -28,6 +28,8 @@ public class Message {
     public static String LengthCheck = "Words length must be less than 20.";
     public static String RPassword = "Password filed is required.";
     public static String RCPassword = "Confirm Password filed is required.";
+    public static String ROPassword = "Old Password filed is required.";
+    public static String OPasswordMatch = "Old Password does not correct.";
     public static String PasswordMatch = "Password and Confirm Password should be the same.";
     public static String LAddress = "Address words length less than 100.";
     public static String RPhone = "Phone field is required.";
