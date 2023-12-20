@@ -151,7 +151,6 @@ $("table tbody").on("click", "#detailUserBtn", function() {
 			DOB,
 			RoleName
 		} = JSON.parse(data);
-		console.log(JSON.parse(data));
 		$("#modalTtl").text(`${FullName}` + " - information");
 		$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
 		$(".firstName").text(FirstName);
@@ -169,10 +168,6 @@ $("table tbody").on("click", "#detailUserBtn", function() {
 	});
 });
 
-$("#roleEdit").on("click",function(){
-	console.log("hello")
-})
-
 });
 
 function roleDelBtn(id) {
@@ -187,26 +182,9 @@ function roleDelBtn(id) {
 		confirmButtonText: 'Yes, delete it!'
 	}).then((result) => {
 		if (result.isConfirmed) {
-			$.ajax({
-				url: "/BulletinOJT/RoleController",
-				type: "DELETE",
-				data: JSON.stringify({ id: id }),
-				contentType: "application/json",
-				success: function(response) {
-					if (response.status == 1) {
-						Swal.fire(
-							'Deleted!',
-							'Your file has been deleted.',
-							'success'
-						)
-						showToast("success", response.message);
-						location.reload();
-					}
-				},
-				error: function(error) {
-					console.error("Error:", error);
-				}
-			});
+			var url = "/BulletinOJT/RoleController?deleteId=" + id;
+    		// Navigate to the URL
+    		window.location.href = url;
 		}
 	})
 })

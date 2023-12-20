@@ -5,15 +5,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.UUID;
-import org.json.JSONException;
-import org.json.JSONObject;
 import bulletin.common.Message;
 import bulletin.dao.Repositories.RoleRepository;
-import bulletin.models.ResponseModel;
 import bulletin.models.Role;
 import bulletin.models.User;
 import bulletin.services.RoleService;
@@ -29,13 +25,23 @@ public class RoleController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 			String url = request.getServletPath().toString();
 			HttpSession session = request.getSession(false);
-
+			String editId = request.getParameter("editId");
+			String delId = request.getParameter("deleteId");
+			
 			if(session == null) {
 		        request.getRequestDispatcher("/login.jsp").include(request, response);
 			}
 			
-			if(url.contentEquals("/RoleController")) {
+			if(url.contentEquals("/RoleController") && editId == null && delId == null) {
 				this.GetAll(request,response);
+			} 
+			
+			if(editId != null) {
+				this.GetRole(request,response);
+			}
+			
+			if(delId != null) {
+				this.DeleteRole(request,response);
 			}
 	}
 	
@@ -45,13 +51,20 @@ public class RoleController extends HttpServlet {
         request.getRequestDispatcher("/Views/Role/index.jsp").forward(request, response);
 	}
 
+	private void GetRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		String editId = request.getParameter("editId");
+		Role role = _roleService.GetRole(editId);
+		request.setAttribute("roles", role);
+        request.getRequestDispatcher("/Views/Role/index.jsp").forward(request, response);
+	}
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-			String id = request.getParameter("id");
-			if(id.isEmpty()) {
-				CreateRole(request,response);
-			}else {
-				UpdateRole(request,response);
-			}
+		String id = request.getParameter("editId");
+		if(id.isEmpty()) {
+			CreateRole(request,response);
+		}else {
+			UpdateRole(request,response);
+		}
 	}
 	
 	private void CreateRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -81,9 +94,28 @@ public class RoleController extends HttpServlet {
 	}
 	
 	private void UpdateRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Role roleList = _roleService.GetAll();
-		request.setAttribute("roles", roleList);
-        request.getRequestDispatcher("/Views/Role/index.jsp").forward(request, response);
+		boolean hasError = Validate(request);
+		HttpSession session = request.getSession(false);
+
+		if(hasError) {
+	        request.getRequestDispatcher("/Views/Role/index.jsp").include(request, response);	
+	        GetRole(request,response);
+		}else {
+			String name = request.getParameter("roleName");
+			String id = request.getParameter("editId");
+			Timestamp updateDate = new Timestamp(System.currentTimeMillis());
+			User user = (User) session.getAttribute("userManager");
+			
+			Role role = new Role();
+			role.setName(name);
+			role.setId(id.toString());
+			role.setUpdatedDate(updateDate);
+			role.setUpdatedUserId(user.getId());
+			
+			Role roles = _roleService.Update(role);
+			request.setAttribute("roles", roles);
+			request.getRequestDispatcher("/Views/Role/index.jsp").forward(request, response);
+		}
 	}
 
 	private boolean Validate(HttpServletRequest request) throws ServletException, IOException {
@@ -101,28 +133,18 @@ public class RoleController extends HttpServlet {
 		return hasError;
 	}
 
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try(BufferedReader reader = request.getReader()) {
-			StringBuilder builder = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				builder.append(line);
-			}
-			
+	private void DeleteRole(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute("userManager");
-			JSONObject object = new JSONObject(builder.toString());
-			String id = object.getString("id");
+			String id = request.getParameter("deleteId");
 			Timestamp deletedDate = new Timestamp(System.currentTimeMillis());
 			
-			ResponseModel model = _roleService.Delete(new Role(id,deletedDate,user.getId(),true));
-			JSONObject jsonResponse = new JSONObject();
-			jsonResponse.put("status", model.getMessageType());
-			jsonResponse.put("message",model.getMessageName());
-			response.setContentType("application/json");
-			response.getWriter().write(jsonResponse.toString());
+			Role model = _roleService.Delete(new Role(id,deletedDate,user.getId(),true));
+			request.setAttribute("roles", model);
+			request.getRequestDispatcher("/Views/Role/index.jsp").forward(request, response);
 			
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

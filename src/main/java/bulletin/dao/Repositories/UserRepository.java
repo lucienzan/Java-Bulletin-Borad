@@ -32,7 +32,7 @@ public class UserRepository implements IUserRepository {
 
 		List<User> userList = new ArrayList<User>();
 		try {
-			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Active = true AND user.DeleteFlag = false";
+			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Active = true AND user.DeleteFlag = false OR role.DeletedFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
 
@@ -296,7 +296,7 @@ public class UserRepository implements IUserRepository {
 	}
 	
 	private boolean DeleteFile(String fileName) throws IOException {
-		if(fileName != null && fileName != "user.png") {
+		if(fileName != null && fileName != "user.png" && !fileName.isEmpty()) {
 			String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
 			
         	File fileUploadDirectory = new File(filePath + "\\" + fileName);
