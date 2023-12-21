@@ -11,7 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import bulletin.common.BCrypt;
 import bulletin.common.DbConnection;
 import bulletin.common.Message;
@@ -31,8 +33,11 @@ public class UserRepository implements IUserRepository {
 		ResultSet resultSet = null;
 
 		List<User> userList = new ArrayList<User>();
+		Role roleModel = new Role();
+		Map<String, String> roleIdToNameMap = new HashMap<>();
+		
 		try {
-			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Active = true AND user.DeleteFlag = false";
+			sqlQuery = "SELECT * FROM user WHERE user.Active = true AND user.DeleteFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
 
@@ -42,13 +47,32 @@ public class UserRepository implements IUserRepository {
 				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				user.setFullName(resultSet.getString("FirstName") + " " + lastName);
 				user.setEmail(resultSet.getString("Email"));
-				user.setRoleId(resultSet.getString("Name"));
+			    String roleId = resultSet.getString("RoleId");
+				user.setRoleId(roleId);
 				user.setAddress(resultSet.getString("Address"));
 				user.setPhone(resultSet.getString("Phone"));
 				user.setDOB(resultSet.getTimestamp("DOB"));
 				user.setActive(resultSet.getBoolean("Active"));
 				user.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
 				userList.add(user);
+				
+				 // Add role ID and name to the map if not already present
+			    if (!roleIdToNameMap.containsKey(roleId)) {
+			    	for (Role role : roleModel.getRoleList() ) {
+				        if(role.getId().contentEquals(roleId)) {
+				        	roleIdToNameMap.put(roleId, role.getName());
+				        }
+					}
+			    }
+			}
+			
+			if(userList.size() > 0) {
+				for (User user : userList) {
+					 String roleId = user.getRoleId();
+					    if (roleIdToNameMap.containsKey(roleId)) {
+					        user.setRoleId(roleIdToNameMap.get(roleId));
+					}
+				}
 			}
 
 		} catch (Exception e) {
@@ -69,16 +93,10 @@ public class UserRepository implements IUserRepository {
 		List<Role> roleList = new ArrayList<Role>();
 
 		try {
-			sqlQuery = "SELECT * FROM role WHERE DeletedFlag = false";
-			preparedStatement = con.prepareStatement(sqlQuery);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				String roleId = resultSet.getString("Id");
-				String name = resultSet.getString("Name");
-				roleList.add(new Role(roleId,name));
-			}
+			Role roleModel = new Role();
+			roleList = roleModel.getRoleList();
 			
-			sqlQuery = "SELECT * FROM user LEFT JOIN role ON user.RoleId = role.Id WHERE user.Id = ? AND user.DeleteFlag = false";
+			sqlQuery = "SELECT * FROM user WHERE user.Id = ? AND user.DeleteFlag = false";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, id);
 			resultSet = preparedStatement.executeQuery();
@@ -93,11 +111,20 @@ public class UserRepository implements IUserRepository {
 				model.setOldProfile(resultSet.getString("Profile"));
 				model.setDOB(resultSet.getTimestamp("DOB"));
 				model.setPhone(resultSet.getString("Phone"));
-				model.setRoleName(resultSet.getString("role.Name"));
-				model.setRoleId(resultSet.getString("role.Id"));
+				model.setRoleName(resultSet.getString("RoleId"));
+				model.setRoleId(resultSet.getString("RoleId"));
 				model.setAddress(resultSet.getString("Address"));
 				model.setRoleList(roleList);
 			}
+			
+			for (Role role : roleList) {
+				if(model.getRoleId() != null) {
+					if(model.getRoleId().contentEquals(role.getId())) {
+						model.setRoleName(role.getName());
+					}
+				}
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -113,18 +140,8 @@ public class UserRepository implements IUserRepository {
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		String password = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
-		List<Role> roleList = new ArrayList<Role>();
 
 		try {
-			sqlQuery = "SELECT * FROM role WHERE DeletedFlag = false";
-			preparedStatement = con.prepareStatement(sqlQuery);
-			resultSet = preparedStatement.executeQuery();
-			while (resultSet.next()) {
-				String id = resultSet.getString("Id");
-				String name = resultSet.getString("Name");
-				roleList.add(new Role(id,name));
-			}
-			
 			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ?";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
@@ -136,7 +153,6 @@ public class UserRepository implements IUserRepository {
 			if (count > 0) {
 				
 				// Email already exists, handle accordingly
-				model.setRoles(roleList);
 				model.setMessageName(Message.AccountExist);
 				model.setMessageType(Message.EXIST);
 
@@ -163,14 +179,12 @@ public class UserRepository implements IUserRepository {
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
-					model.setRoles(roleList);
 					model.setMessageName(Message.AccountSuccess);
 					model.setMessageType(Message.SUCCESS);
 				}
 			}
 
 		} catch (SQLException e) {
-			model.setRoles(roleList);
 			model.setMessageName(Message.AccountFail);
 			model.setMessageType(Message.FAIL);
 			e.printStackTrace();
@@ -239,7 +253,6 @@ public class UserRepository implements IUserRepository {
 				preparedStatement.setTimestamp(11, obj.getUpdatedDate());
 				preparedStatement.setBoolean(12, false);
 				preparedStatement.setString(13, obj.getId());
-
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
@@ -284,8 +297,8 @@ public class UserRepository implements IUserRepository {
 			preparedStatement.setString(3, currentUser);
 			preparedStatement.setTimestamp(4, deleteDate);
 			preparedStatement.setString(5, id);
-
 			int result = preparedStatement.executeUpdate();
+			
 			if (result == Message.SUCCESS) {
 				model.setMessageType(Message.SUCCESS);
 				model.setMessageName(Message.AccountDelete);

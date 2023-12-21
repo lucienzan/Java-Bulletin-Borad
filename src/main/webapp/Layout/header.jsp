@@ -44,7 +44,6 @@
         <li class="nav-item">
     		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page"  href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>" >User</a>
         </li>
-        
         <li class="nav-item">
           <a class="nav-link <%= request.getRequestURI().endsWith("post-list.jsp") ? "active" : "" %>" href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>">Post</a>
         </li>
@@ -53,7 +52,7 @@
           <%= userInfo.getFirstName() %>
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="<%= request.getContextPath() + "/profile?userId=" + userInfo.getId() %>">Profile</a></li>
+            <li><a class="dropdown-item" id="profileRoute" href="<%= request.getContextPath() + "/profile?userId=" + userInfo.getId() %>">Profile</a></li>
             <li><a class="dropdown-item" href="<%= request.getContextPath() + "/Views/Account/change-password.jsp" %>">Change Password</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>

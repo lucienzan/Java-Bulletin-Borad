@@ -1,5 +1,6 @@
 <%@ include file="/Layout/header.jsp" %>
 <jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
+<jsp:useBean id="roles" class="bulletin.models.Role" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="user"/>
 	<div>
@@ -93,7 +94,7 @@
                         <span class="text-danger fw-bold">*</span>
                         <select class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}" name="roleId">
                             <option selected disabled value="">Choose a role</option>
-                        	<c:forEach var="role" items="${model.getRoles()}">
+                        	<c:forEach var="role" items="${roles.getRoleList()}">
                         	  <option value="${ role.getId() }" ${user.roleId eq role.getId() ? 'selected' : ''}><c:out value="${role.getName()}"></c:out></option>
                         	</c:forEach>
                         </select>

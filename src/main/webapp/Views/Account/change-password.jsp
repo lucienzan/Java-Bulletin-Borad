@@ -18,7 +18,7 @@
                     <div class="col-6 mb-3">
                         <label for="opassword" class="form-label">Old Password</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="password" id="opassword" name="opassword" class="form-control rounded ${not empty requestScope.opasswordError || model.getMessageType() == 3 ? 'is-invalid' : ''}" placeholder="Enter your old password.">
+                        <input required type="password" id="opassword" name="opassword" class="form-control rounded ${not empty requestScope.opasswordError || model.getMessageType() == 3 ? 'is-invalid' : ''}" placeholder="Enter your old password.">
 						<c:choose>
 							<c:when test="${requestScope.opasswordError != null}">
 								<div class="invalid-feedback">
@@ -35,7 +35,7 @@
                     <div class="col-6 mb-3">
                         <label for="password" class="form-label">New Password</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="password" id="password" class="form-control rounded ${not empty requestScope.passwordError ? 'is-invalid' : ''}" name="password" placeholder="Enter your new password.">
+                        <input required type="password" id="password" class="form-control rounded ${not empty requestScope.passwordError ? 'is-invalid' : ''}" name="password" placeholder="Enter your new password.">
                         <c:if test="${requestScope.passwordError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.passwordError}" />
@@ -45,7 +45,7 @@
                     <div class="col-6 mb-3">
                         <label for="cpassword" class="form-label">Confirm Password</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="password" id="cpassword" name="cpassword" class="form-control rounded ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" placeholder="Enter your confirm password.">
+                        <input required type="password" id="cpassword" name="cpassword" class="form-control rounded ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" placeholder="Enter your confirm password.">
                     	<c:if test="${requestScope.cpasswordError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.cpasswordError}" />

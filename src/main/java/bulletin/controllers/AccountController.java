@@ -242,7 +242,7 @@ public class AccountController extends HttpServlet {
 		}
 
 		if (!request.getParameter("action").contentEquals("forgotPwd")) {
-			if (password == null) {
+			if (password.isEmpty()) {
 				request.setAttribute("passwordError", Message.RPassword);
 				error = true;
 			} else if (!password.matches(passwordPattern)) {
@@ -257,7 +257,7 @@ public class AccountController extends HttpServlet {
 			String cPassword = request.getParameter("cpassword");
 
 			// password check
-			if (cPassword.toString() == null) {
+			if (cPassword.isEmpty()) {
 				request.setAttribute("cpasswordError", Message.RCPassword);
 				error = true;
 			} else if (!password.contentEquals(cPassword)) {
@@ -269,7 +269,7 @@ public class AccountController extends HttpServlet {
 		if (request.getParameter("action").contentEquals("changePwd")) {
 			String oPassword = request.getParameter("opassword");
 			// old password check
-			if (oPassword.toString() == null) {
+			if (oPassword.isEmpty()) {
 				request.setAttribute("opasswordError", Message.ROPassword);
 				error = true;
 			} else if (!oPassword.matches(passwordPattern)) {

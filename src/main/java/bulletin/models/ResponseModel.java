@@ -1,13 +1,10 @@
 package bulletin.models;
 
-import java.util.List;
-
 public class ResponseModel {
 	
 	private int MessageType;
 	private String MessageName;
 	private User UserModel;
-	private List<Role> Roles;
 	
 	public int getMessageType() {
 		return MessageType;
@@ -31,13 +28,5 @@ public class ResponseModel {
 
 	public void setUserModel(User userModel) {
 		UserModel = userModel;
-	}
-
-	public List<Role> getRoles() {
-		return Roles;
-	}
-
-	public void setRoles(List<Role> roles) {
-		Roles = roles;
 	}
 }

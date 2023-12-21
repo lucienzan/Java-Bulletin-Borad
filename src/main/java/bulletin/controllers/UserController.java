@@ -21,13 +21,10 @@ import org.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import bulletin.common.Message;
-import bulletin.dao.Repositories.RoleRepository;
 import bulletin.dao.Repositories.UserRepository;
 import bulletin.models.ResponseModel;
 import bulletin.models.User;
-import bulletin.services.RoleService;
 import bulletin.services.UserService;
-import bulletin.models.Role;
 
 @WebServlet("/")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
@@ -37,11 +34,9 @@ public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private UserService _userService;
-	private RoleService _roleService;
 
 	public void init() {
 		this._userService = new UserService(new UserRepository());
-		this._roleService = new RoleService(new RoleRepository());
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -96,11 +91,6 @@ public class UserController extends HttpServlet {
 
 	private void GetUser(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Role role = _roleService.GetAll();
-		List<Role> roleList = role.getRoleList();
-		ResponseModel model = new ResponseModel();
-		model.setRoles(roleList);
-		request.setAttribute("model", model);
 		request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
 	}
 	
@@ -135,11 +125,11 @@ public class UserController extends HttpServlet {
              String fileName = "user.png";
              
      		if(part != null && part.getSize() > 0) {
-     			 fileName = extractFileName(part);
-     			 boolean isAllowExtension =  checkExtension(fileName);
+     			 fileName = ExtractFileName(part);
+     			 boolean isAllowExtension =  CheckExtension(fileName);
      		     if(isAllowExtension == false) {
      		    	request.setAttribute("fileError", Message.FileTypeError);
-     				this.GetUser(request, response);
+     				request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
      				return;
      		     }
      		}
@@ -150,7 +140,7 @@ public class UserController extends HttpServlet {
      		User user= (User) session.getAttribute("userManager");
 
     		if (errorExist) {
-    			this.GetUser(request, response);
+    			request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
     		} else {
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
@@ -163,7 +153,7 @@ public class UserController extends HttpServlet {
 
     			UUID randomIdUuid = UUID.randomUUID();
 	            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+    			Timestamp dob = ConvertStringToTimestamp(request.getParameter("dob"));
     			String id = randomIdUuid.toString();
 
     			ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
@@ -204,14 +194,12 @@ public class UserController extends HttpServlet {
              
  			String id = request.getParameter("id");
  			String isProfileRoute = request.getParameter("isProfileRoute");
- 			User userModel = _userService.Get(id);
              
      		if(part != null && part.getSize() > 0) {
-     			 fileName = extractFileName(part);
-     			 boolean isAllowExtension =  checkExtension(fileName);
+     			 fileName = ExtractFileName(part);
+     			 boolean isAllowExtension =  CheckExtension(fileName);
      		     if(isAllowExtension == false) {
      		    	request.setAttribute("fileError", Message.FileTypeError);
-     	 			request.setAttribute("userModel", userModel);
      	 			if(!isProfileRoute.contentEquals("true"))
      	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
      	 			else
@@ -226,7 +214,6 @@ public class UserController extends HttpServlet {
      		User user= (User) session.getAttribute("userManager");
 
     		if (errorExist) {
- 	 			request.setAttribute("userModel", userModel);
  	 			if(isProfileRoute == null)
  	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
  	 			else
@@ -242,7 +229,7 @@ public class UserController extends HttpServlet {
      			String profile = fileName;
 
 	            Timestamp updateDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+    			Timestamp dob = ConvertStringToTimestamp(request.getParameter("dob"));
 
     			ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address,
     					profile, phone, roleId, dob, updateDate, user.getId(), oldProfile));
@@ -262,14 +249,12 @@ public class UserController extends HttpServlet {
     		        }
     		        
     		        request.setAttribute("model", model);
-     	 			request.setAttribute("userModel", userModel);
      	 			if(isProfileRoute == null)
      	 				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
      	 			else
          		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     			}else {
     				request.setAttribute("model", model);
-     	 			request.setAttribute("userModel", userModel);
      	 			if(isProfileRoute == null)
      	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
      	 			else
@@ -281,7 +266,7 @@ public class UserController extends HttpServlet {
 		}	
 	}
 	
-	private String extractFileName(Part part) {
+	private String ExtractFileName(Part part) {
 	        String contentDisp = part.getHeader("content-disposition");
 	        String[] items = contentDisp.split(";");
 	        UUID uuid = UUID.randomUUID();
@@ -293,7 +278,7 @@ public class UserController extends HttpServlet {
 	        return "";
 	    }
 	
-	private static Timestamp convertStringToTimestamp(String inputDateStr) {
+	private static Timestamp ConvertStringToTimestamp(String inputDateStr) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date parsedDate =  dateFormat.parse(inputDateStr);
@@ -395,7 +380,7 @@ public class UserController extends HttpServlet {
 		return error;
 	}
 	
-	private boolean checkExtension(String fileName) {
+	private boolean CheckExtension(String fileName) {
 		String [] allowExtesnions = {"png","jpeg","jpg"};
 		String getExtension = null;
 		int lastDotIndex = fileName.lastIndexOf('.');

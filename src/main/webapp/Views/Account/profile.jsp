@@ -1,9 +1,12 @@
 <%@ include file="/Layout/header.jsp"%>
 <title>Bulletin Board | Profile</title>
 <h3>User Profile</h3>
-<jsp:useBean id="userModel" class="bulletin.models.User" scope="request"></jsp:useBean>
+<jsp:useBean id="roles" class="bulletin.models.Role"
+	scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel"
 	scope="request"></jsp:useBean>
+<jsp:useBean id="userModel" class="bulletin.models.User"
+scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="userModel" />
 <div class="mt-3">
 	<ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -15,50 +18,42 @@
 		<li class="nav-item" role="presentation">
 			<button class="nav-link" id="profile-tab" data-bs-toggle="tab"
 				data-bs-target="#profile-tab-pane" type="button" role="tab"
-				aria-controls="profile-tab-pane" aria-selected="false">Edit
-				Profile</button>
+				aria-controls="profile-tab-pane" aria-selected="false">Edit Profile</button>
 		</li>
 	</ul>
 	<div class="tab-content" id="myTabContent">
 		<div class="tab-pane fade show active" id="home-tab-pane"
 			role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-			<div class="row mt-4">
-				<div class="col-3">
-					<img alt="user-profile" class="rounded" width="200" height="200"
-						src="<%= request.getContextPath() + "/assets/img/profile/" + userModel.getProfile() %>">
-				</div>
+<div class="row mt-4">
 				<div class="col-7">
 					<div class="row">
 						<div class="col-6">
 							<span class="fw-bold">First Name</span>
-							<p class="firstName"><%= userModel.getFirstName() %></p>
+							<p class="firstName"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold">Last Name</span>
-							<p class="lastName"><%= userModel.getLastName() %></p>
+							<p class="lastName"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold">Role</span>
-							<p class="role"><%= userModel.getRoleName() %></p>
+							<p class="role"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold">Email</span>
-							<p class="email"><%= userModel.getEmail() %></p>
+							<p class="email"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold ">Address</span>
-							<p class="address"><%= userModel.getAddress() %></p>
+							<p class="address"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold ">Mobile</span>
-							<p class="phone"><%= userModel.getPhone() %></p>
+							<p class="phone"></p>
 						</div>
 						<div class="col-6">
 							<span class="fw-bold">Date Of Birth</span>
-							<p class="dob">
-								<fmt:formatDate pattern="dd/MM/yyyy"
-									value="<%= userModel.getDOB() %>" />
-							</p>
+							<p class="dob"></p>
 						</div>
 					</div>
 				</div>
@@ -81,7 +76,7 @@
 			<form id="myForm"
 				action="<%= request.getContextPath()+"/updateUser" %>" method="POST"
 				enctype="multipart/form-data" class="g-3 mt-4">
-				<input type="hidden" name="id" value="${ userModel.getId() }">
+				<input type="hidden" name="id" id="hiddenId" value="${ userModel.getId() }">
 				<input type="hidden" name="isProfileRoute" value=true> <input
 					type="hidden" name="oldProfile"
 					value="${ userModel.getOldProfile() }">
@@ -147,7 +142,7 @@
 							class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}"
 							name="roleId">
 							<option selected disabled value="">Choose a role</option>
-							<c:forEach var="role" items="${userModel.getRoleList()}">
+							<c:forEach var="role" items="${roles.getRoleList()}">
 								<option value="${ role.getId() }"
 									${userModel.getRoleId() eq role.getId() ? 'selected' : ''}><c:out
 										value="${role.getName()}"></c:out></option>
@@ -221,9 +216,3 @@
 	</div>
 </div>
 <%@ include file="/Layout/footer.jsp"%>
-<script>
-	<% if (model.getMessageType() == 1){ %>
-	location.reload();
-	window.stop();
-	<% } %>
-</script>

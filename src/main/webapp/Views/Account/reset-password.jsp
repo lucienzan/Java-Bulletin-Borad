@@ -47,7 +47,7 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HT
 							<div class="d-flex justify-content-between">
 							<label class="form-label" for="password">Create New Password</label> 
 							</div>
-							<input class="form-control ${not empty requestScope.passwordError ? 'is-invalid' : ''}" type="password" placeholder="********" required id="password" name="password">
+							<input required class="form-control ${not empty requestScope.passwordError ? 'is-invalid' : ''}" type="password" placeholder="********" required id="password" name="password">
 							<c:if test="${requestScope.passwordError != null}">
 								<div class="invalid-feedback">
 									<c:out value="${requestScope.passwordError}" />
@@ -58,7 +58,7 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HT
 							<div class="d-flex justify-content-between">
 							<label class="form-label" for="cpassword">Confirm Password</label> 
 							</div>
-							<input class="form-control ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" type="password" placeholder="********" required id="cpassword" name="cpassword">
+							<input required class="form-control ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" type="password" placeholder="********" required id="cpassword" name="cpassword">
 							<c:if test="${requestScope.cpasswordError != null}">
 								<div class="invalid-feedback">
 									<c:out value="${requestScope.cpasswordError}" />

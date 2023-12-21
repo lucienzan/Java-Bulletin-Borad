@@ -45,7 +45,7 @@
 						<input type="hidden" name="action" value="forgotPwd">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
-							<input class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="<%= user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
+							<input required class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="<%= user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
 							<c:if test="${requestScope.emailError != null}">
 								<div class="invalid-feedback">
 									<c:out value="${requestScope.emailError}" />
