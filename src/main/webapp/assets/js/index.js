@@ -153,7 +153,12 @@ $("#postList").DataTable({
 			}
 		},
 		{ "data": "Title", "name": "Title", "width": "20%" },
-		{ "data": "Description", "name": "Description", "width": "20%" },
+		{
+			"render": function(data, type, full, meta)  {
+				var describe = full.Description.length > 120 ? full.Description.substring(0,120).concat("...") : full.Description;
+				return describe;
+			}
+		},
 		{
 			"render": function(data, type, full, meta)  {
 
@@ -226,7 +231,6 @@ function deleteConfirm(table, id, route) {
 				data: JSON.stringify({ id: id }),
 				contentType: "application/json",
 				success: function(response) {
-					console.log(response.status);
 					if (response.status == 1) {
 						Swal.fire(
 							'Deleted!',

@@ -40,10 +40,12 @@ public class UserRepository implements IUserRepository {
 			sqlQuery = "SELECT * FROM user WHERE user.Active = true AND user.DeleteFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
+
 			while (resultSet.next()) {
 				User user = new User();
 				user.setId(resultSet.getString("Id"));
-				user.setFullName(resultSet.getString("FirstName") + " " + resultSet.getString("LastName"));
+				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
+				user.setFullName(resultSet.getString("FirstName") + " " + lastName);
 				user.setEmail(resultSet.getString("Email"));
 			    String roleId = resultSet.getString("RoleId");
 				user.setRoleId(roleId);

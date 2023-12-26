@@ -19,9 +19,20 @@ public List<Post> GetAll(){
 	return postList;
 }
 
+public Post Get(String id){
+	Post model = _repository.Get(id);
+	return model;
+}
+
 public ResponseModel Create(Post obj)
 {
 	ResponseModel model = _repository.Create(obj);
+	return model;
+}
+
+public ResponseModel Update(Post obj)
+{
+	ResponseModel model = _repository.Update(obj);
 	return model;
 }
 

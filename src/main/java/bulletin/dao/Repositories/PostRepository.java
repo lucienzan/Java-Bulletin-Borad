@@ -44,6 +44,35 @@ public class PostRepository implements IPostRepository{
 		return postList;
 	}
 
+	public Post Get(String id){
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		Post post = new Post();
+		
+		try {
+			sqlQuery = "SELECT * FROM post WHERE post.Id = ? AND post.DeletedFlag = false";
+			statement = con.prepareStatement(sqlQuery);
+			statement.setString(1, id);
+			resultSet = statement.executeQuery();
+			
+			while (resultSet.next()) {
+				post.setId(resultSet.getString("Id"));
+				post.setTitle(resultSet.getString("Title"));
+				post.setDescription(resultSet.getString("Description"));
+				post.setIsPublished(resultSet.getBoolean("IsPublished"));
+				post.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		DbConnection.CloseConnection(con, statement, resultSet);
+		return post;
+	}
+	
 	public ResponseModel Create(Post obj) {
 		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
@@ -74,6 +103,52 @@ public class PostRepository implements IPostRepository{
 				
 				if (result == Message.SUCCESS) {
 					model.setMessageName(Message.CreateSuccess);
+					model.setMessageType(Message.SUCCESS);
+				}
+		    }
+		} catch (Exception e) {
+			model.setMessageName(Message.SError);
+			model.setMessageType(Message.FAIL);
+			e.printStackTrace();
+		}
+		
+		DbConnection.CloseConnection(con, statement, resultSet);
+		return model;
+	}
+	
+	public ResponseModel Update(Post obj) {
+		DbConnection.GetInstance();
+		Connection con = DbConnection.GetDbConnection();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		ResponseModel model = new ResponseModel();
+		
+		try {
+			sqlQuery = "SELECT COUNT(*) FROM post WHERE Title = ? AND Id != ? AND DeletedFlag = false";
+			statement = con.prepareStatement(sqlQuery);
+			statement.setString(1, obj.getTitle());
+			statement.setString(2, obj.getId());
+			resultSet = statement.executeQuery();
+			resultSet.next();
+			
+		    if (resultSet.getInt(1) > 0) {
+		    	model.setMessageName(Message.AccountExist);
+				model.setMessageType(Message.EXIST);
+		    } else {
+		    	sqlQuery = "UPDATE post SET Title = ?,Description = ?,IsPublished = ?,DeletedFlag = ?,UpdatedUserId = ?,UpdatedDate = ? WHERE Id = ?";
+				statement = con.prepareStatement(sqlQuery);
+				statement.setString(1, obj.getTitle());
+				statement.setString(2, obj.getDescription());
+				statement.setBoolean(3, obj.isIsPublished());
+				statement.setBoolean(4, obj.isDeletedFlag());
+				statement.setString(5, obj.getUpdatedUserId());
+				statement.setTimestamp(6, obj.getUpdatedDate());
+				statement.setString(7, obj.getId());
+				
+				int result = statement.executeUpdate();
+				
+				if (result == Message.SUCCESS) {
+					model.setMessageName(Message.UpdateSuccess);
 					model.setMessageType(Message.SUCCESS);
 				}
 		    }

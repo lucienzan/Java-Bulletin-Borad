@@ -39,6 +39,11 @@ public class PostController extends HttpServlet {
 				this.CreatePost(request,response);
 			}
 		}
+		
+		String id = request.getParameter("postId");
+		if(id != null) {
+			this.GetPost(request,response);
+		}
 			this.GetAll(request,response);
 	}
 
@@ -51,21 +56,55 @@ public class PostController extends HttpServlet {
 		// Send the JSON response to the client
 		response.getWriter().write(json);
 	}
+	
+	private void GetPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String id = request.getParameter("postId");
+		Post post = _postService.Get(id);
+		request.setAttribute("post", post);
+		request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
+	}
 
 	private void CreatePost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
 	}
 	
+	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String id = request.getParameter("id");
 		if(id != null) {
-			
+			this.UpdatePost(request,response);
 		}else {
 			this.InsertPost(request,response);
 		}
 	}
+	
+	private void UpdatePost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		boolean hasError = Validation(request);
+		if(hasError) {
+			request.getRequestDispatcher("/Views/Post/edit.jsp").include(request, response);
+		}else {
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
+			Timestamp updatedDate = new Timestamp(System.currentTimeMillis());
+			Post post = new Post();
+			
+			post.setId(request.getParameter("id"));
+			post.setTitle(request.getParameter("title"));
+			post.setDescription(request.getParameter("description"));
+			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
+			post.setIsPublished(isPublished);
+			post.setUpdatedDate(updatedDate);
+			post.setUpdatedUserId(user.getId());
 
+			ResponseModel model = _postService.Update(post);
+			request.setAttribute("model", model);
+			request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
+		}
+	}
+
+	
 	private void InsertPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		boolean hasError = Validation(request);
@@ -77,7 +116,7 @@ public class PostController extends HttpServlet {
 			String id = UUID.randomUUID().toString();
 			String title = request.getParameter("title");
 			String description = request.getParameter("description");
-			boolean isPublished = request.getParameter("isPublished").contentEquals("on") ? true : false;
+			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
 			Timestamp createdDate = new Timestamp(System.currentTimeMillis());
 			ResponseModel model = _postService.Create(new Post(id,title,description,isPublished,createdDate,user.getId()));
 			request.setAttribute("model", model);
