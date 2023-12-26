@@ -189,8 +189,8 @@ $("#postList").DataTable({
                 </button>`;
 				actionsDropdown += `
                 <ul class="dropdown-menu">
-                <li><a id='detailUserBtn' class='dropdown-item'>View</a></li>
-                <li><a href='/BulletinOJT/PostController?postId=${full.Id}' id='editUserBtn' class='dropdown-item'>Edit</a></li>
+                <li><a id='viewPostBtn' class='dropdown-item'>View</a></li>
+                <li><a href='/BulletinOJT/PostController/post-edit?postId=${full.Id}' class='dropdown-item'>Edit</a></li>
                 <li><a id='deletePostBtn' class='dropdown-item text-danger'>Delete</a></li>
                 </ul>
                 </div>`;
@@ -204,6 +204,33 @@ $("#postList").DataTable({
 		}
 	],
 });
+
+// post detail
+$("table tbody").on("click", "#viewPostBtn", function () {
+    let id = $(this).parent().parent().parent().siblings("input").val();
+    console.log(id);
+    $.get("/BulletinOJT/PostController/post-detail", { id: id }, function (data) {
+		console.log(data);
+        let {
+            Title,
+            Description,
+            IsPublished,
+            CreatedUserId,
+            CreatedDate,
+        } = JSON.parse(data);
+        $("#modalTtl").text(Title);
+        $(".ttl").text(Title);
+        $(".describe").text(Description);
+        $(".author").text(CreatedUserId);
+        if (IsPublished == false) {
+            $(".status").html("<span class='badge rounded-pill bg-danger'>Unpublished</span>")
+        } else {
+            $(".status").html("<span class='badge rounded-pill bg-success'>Published</span>")
+        }
+        $(".date").text(formatDate(CreatedDate));
+        $("#postModal").modal("show");
+    });
+})
 
 // post delete
 $("table tbody").on("click", "#deletePostBtn", function () {

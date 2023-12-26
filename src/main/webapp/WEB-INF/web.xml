@@ -88,4 +88,16 @@
     <servlet-name>PostController</servlet-name>
     <url-pattern>/PostController</url-pattern>
   </servlet-mapping>
+    <servlet-mapping>
+    <servlet-name>PostController</servlet-name>
+    <url-pattern>/PostController/post-create</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PostController</servlet-name>
+    <url-pattern>/PostController/post-edit</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PostController</servlet-name>
+    <url-pattern>/PostController/post-detail</url-pattern>
+  </servlet-mapping>
 </web-app>

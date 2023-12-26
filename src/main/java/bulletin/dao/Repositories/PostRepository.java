@@ -52,17 +52,19 @@ public class PostRepository implements IPostRepository{
 		Post post = new Post();
 		
 		try {
-			sqlQuery = "SELECT * FROM post WHERE post.Id = ? AND post.DeletedFlag = false";
+			sqlQuery = "SELECT * FROM post INNER JOIN user ON post.CreatedUserId = user.Id WHERE post.Id = ? AND post.DeletedFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			statement.setString(1, id);
 			resultSet = statement.executeQuery();
 			
 			while (resultSet.next()) {
+				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				post.setId(resultSet.getString("Id"));
 				post.setTitle(resultSet.getString("Title"));
 				post.setDescription(resultSet.getString("Description"));
 				post.setIsPublished(resultSet.getBoolean("IsPublished"));
 				post.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
+				post.setCreatedUserId(resultSet.getString("FirstName") + " " + lastName);
 			}
 
 		} catch (Exception e) {

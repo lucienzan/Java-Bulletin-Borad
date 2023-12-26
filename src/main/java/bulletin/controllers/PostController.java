@@ -33,18 +33,20 @@ public class PostController extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String action = request.getParameter("action");
-		if(action != null) {
-			if(action.contentEquals("postCreate")) {
-				this.CreatePost(request,response);
-			}
-		}
+		String url = request.getRequestURL().toString();
+		String contentType = request.getContentType();
 		
-		String id = request.getParameter("postId");
-		if(id != null) {
+		if (contentType == null && url.endsWith("PostController")) {
+			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
+		} else if (contentType != null && url.endsWith("PostController")) {
+			this.GetAll(request,response);
+		} else if (url.endsWith("post-detail")) {
+			this.ShowPost(request,response);
+		} else if (url.endsWith("post-create")) {
+			this.CreatePost(request,response);
+		} else if (url.endsWith("post-edit")) {
 			this.GetPost(request,response);
 		}
-			this.GetAll(request,response);
 	}
 
 	private void GetAll(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -78,6 +80,27 @@ public class PostController extends HttpServlet {
 			this.InsertPost(request,response);
 		}
 	}
+
+
+	private void InsertPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		boolean hasError = Validation(request);
+		if(hasError) {
+			request.getRequestDispatcher("/Views/Post/create.jsp").include(request, response);
+		}else {
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
+			String id = UUID.randomUUID().toString();
+			String title = request.getParameter("title");
+			String description = request.getParameter("description");
+			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
+			Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+			ResponseModel model = _postService.Create(new Post(id,title,description,isPublished,createdDate,user.getId()));
+			request.setAttribute("model", model);
+			request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
+		}
+	}
+	
 	
 	private void UpdatePost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -103,25 +126,14 @@ public class PostController extends HttpServlet {
 			request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
 		}
 	}
-
 	
-	private void InsertPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		boolean hasError = Validation(request);
-		if(hasError) {
-			request.getRequestDispatcher("/Views/Post/create.jsp").include(request, response);
-		}else {
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute("userManager");
-			String id = UUID.randomUUID().toString();
-			String title = request.getParameter("title");
-			String description = request.getParameter("description");
-			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
-			Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-			ResponseModel model = _postService.Create(new Post(id,title,description,isPublished,createdDate,user.getId()));
-			request.setAttribute("model", model);
-			request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
-		}
+	private void ShowPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String id = request.getParameter("id");
+		Post post = _postService.Get(id);
+		
+		Gson gson = new GsonBuilder().serializeNulls().create();
+		String obj = gson.toJson(post);
+		response.getWriter().write(obj);
 	}
 	
 	private boolean Validation(HttpServletRequest request) {
@@ -150,6 +162,7 @@ public class PostController extends HttpServlet {
 		return hasError;
 	}
 
+	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try (BufferedReader reader = request.getReader()) {
