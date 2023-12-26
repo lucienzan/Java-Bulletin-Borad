@@ -8,7 +8,7 @@ public class Message {
     public static int EXIST = 3;
     
     // Success Messages
-    public static String AccountSuccess = "Successfully created.";
+    public static String CreateSuccess = "Successfully created.";
     public static String LoginSuccess = "Successfully logined";
     public static String UpdateSuccess = "Successfully updated.";
     public static String DeleteSuccess = "Successfully deleted.";
@@ -43,8 +43,12 @@ public class Message {
     
     // Role
     public static String RRole = "Role field is required.";
-    public static String RoleExist = "Role's name has already added.";
-
+    
+    // Post
+    public static String RTitle = "Title field is required.";
+    public static String RDescription = "Description field is required.";
+    public static String LTitle = "Title words length must be less than 150.";
+    public static String LDescription = "Description words length must be less than 350.";
 
     // SQL Error
     public static String SError = "Either server or sql is failed.";

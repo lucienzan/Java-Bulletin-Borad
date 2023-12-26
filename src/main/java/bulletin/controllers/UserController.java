@@ -406,7 +406,7 @@ public class UserController extends HttpServlet {
 			}
 
 			JSONObject jsonData = new JSONObject(requestBody.toString());
-			String userId = jsonData.getString("userId");
+			String userId = jsonData.getString("id");
      		HttpSession session = request.getSession(false);
      		User user= (User) session.getAttribute("userManager");
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jakarta.ee/xml/ns/jakartaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee; https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd" id="WebApp_ID" version="6.0">
-  <welcome-file-list>
+<welcome-file-list>
     <welcome-file>login.jsp</welcome-file>
   </welcome-file-list>
   <context-param>
     <param-name>fileDir</param-name>
     <param-value>D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile</param-value>
   </context-param>
-   <context-param>
+  <context-param>
     <param-name>templateDir</param-name>
     <param-value>D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\template\\reset.html</param-value>
   </context-param>
@@ -77,5 +77,15 @@
   <servlet-mapping>
     <servlet-name>RoleController</servlet-name>
     <url-pattern>/RoleController</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PostController</display-name>
+    <servlet-name>PostController</servlet-name>
+    <servlet-class>bulletin.controllers.PostController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PostController</servlet-name>
+    <url-pattern>/PostController</url-pattern>
   </servlet-mapping>
 </web-app>

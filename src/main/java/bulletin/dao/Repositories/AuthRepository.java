@@ -54,7 +54,7 @@ public class AuthRepository implements IAuthRepository {
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
-					model.setMessageName(Message.AccountSuccess);
+					model.setMessageName(Message.CreateSuccess);
 					model.setMessageType(Message.SUCCESS);
 				}
 			}

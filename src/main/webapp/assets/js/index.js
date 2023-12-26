@@ -1,5 +1,7 @@
 ﻿jQuery.noConflict();
 jQuery(document).ready(function($) {
+
+// user table
 $("#userList").DataTable({
 	"processing": true,
 	"bDestroy": true,
@@ -91,6 +93,7 @@ $("#userList").DataTable({
 	],
 });
 
+// user delete
 $("table tbody").on("click", "#deleteUserBtn", function() {
 	let userId = $(this).parent().parent().parent().siblings("input").val();
 	let table = $("#userList").DataTable();
@@ -98,6 +101,113 @@ $("table tbody").on("click", "#deleteUserBtn", function() {
 	deleteConfirm(table, userId, url);
 });
 	
+// user detail
+$("table tbody").on("click", "#detailUserBtn", function() {
+	let id = $(this).parent().parent().parent().siblings("input").val();
+	$.get("/BulletinOJT/UserController/user-detail", { id: id }, function(data) {
+		let {
+			FullName,
+			Profile,
+			Address,
+			Email,
+			FirstName,
+			LastName,
+			Phone,
+			DOB,
+			RoleName
+		} = JSON.parse(data);
+		$("#modalTtl").text(`${FullName}` + " - information");
+		$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
+		$(".firstName").text(FirstName);
+		$(".lastName").text(LastName);
+		if (RoleName == "Admin" || RoleName == "admin") {
+			$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
+		} else if (RoleName == "User" || RoleName == "user") {
+			$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
+		} else {
+			$(".role").html("<span class='badge rounded-pill bg-secondary'>Guest</span>");
+		}
+		$(".address").text(Address == "" ? "Unknown" : Address);
+		$(".email").text(Email);
+		$(".phone").text(Phone == null ? "Unknown" : Phone);
+		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
+		$("#exampleModal").modal("show");
+	});
+});
+
+// post table
+$("#postList").DataTable({
+	"processing": true,
+	"bDestroy": true,
+	"ajax": {
+		"url": "/BulletinOJT/PostController",
+		"type": "GET",
+		"datatype": "json",
+		"contentType": "application/json",
+		"dataSrc": ""
+	},
+	"columns": [
+		{
+			"render": function(data, type, full, meta) {
+				return meta.row + meta.settings._iDisplayStart + 1;
+			}
+		},
+		{ "data": "Title", "name": "Title", "width": "20%" },
+		{ "data": "Description", "name": "Description", "width": "20%" },
+		{
+			"render": function(data, type, full, meta)  {
+
+				var str = "";
+
+				if (full.IsPublished) {
+					str = `<span class='badge rounded-pill bg-primary'>Published</span>`;
+				} else {
+					str = `<span class='badge rounded-pill bg-secondary'>Unpublished</span>`;
+				}
+
+				return str;
+			}
+		},
+		{
+			"render": function(data, type, full, meta)  {
+				var date = formatDate(full.CreatedDate);
+				return date;
+			}
+		},
+		{
+			render: function(data, type, full, meta)  {
+
+				var actionsDropdown = `
+                <div class="dropdown-center text-center">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                   Control
+                </button>`;
+				actionsDropdown += `
+                <ul class="dropdown-menu">
+                <li><a id='detailUserBtn' class='dropdown-item'>View</a></li>
+                <li><a href='/BulletinOJT/PostController?postId=${full.Id}' id='editUserBtn' class='dropdown-item'>Edit</a></li>
+                <li><a id='deletePostBtn' class='dropdown-item text-danger'>Delete</a></li>
+                </ul>
+                </div>`;
+				var hdn = "<input type='hidden' id='hdnUserId' value=" + full.Id + " />";
+				var actions = actionsDropdown + hdn;
+
+				return actions;
+			},
+			"orderable": false,
+
+		}
+	],
+});
+
+// post delete
+$("table tbody").on("click", "#deletePostBtn", function () {
+    let id = $(this).parent().parent().parent().siblings("input").val();
+    let table = $("#postList").DataTable();
+	let url = "/BulletinOJT/PostController";
+	deleteConfirm(table, id, url);
+})
+
 // Delete confirm pop up box
 function deleteConfirm(table, id, route) {
 	Swal.fire({
@@ -113,9 +223,10 @@ function deleteConfirm(table, id, route) {
 			$.ajax({
 				url: route,
 				type: "DELETE",
-				data: JSON.stringify({ userId: id }),
+				data: JSON.stringify({ id: id }),
 				contentType: "application/json",
 				success: function(response) {
+					console.log(response.status);
 					if (response.status == 1) {
 						Swal.fire(
 							'Deleted!',
@@ -135,38 +246,6 @@ function deleteConfirm(table, id, route) {
 		}
 	})
 }
-
-//user detail
-$("table tbody").on("click", "#detailUserBtn", function() {
-	let id = $(this).parent().parent().parent().siblings("input").val();
-	$.get("/BulletinOJT/UserController/user-detail", { id: id }, function(data) {
-		let {
-			FullName,
-			Profile,
-			Address,
-			Email,
-			FirstName,
-			LastName,
-			Phone,
-			DOB,
-			RoleName
-		} = JSON.parse(data);
-		$("#modalTtl").text(`${FullName}` + " - information");
-		$(".profileImg").attr("src", "/BulletinOJT/assets/img/profile/" + Profile);
-		$(".firstName").text(FirstName);
-		$(".lastName").text(LastName);
-		if (RoleName == "Admin") {
-			$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
-		} else {
-			$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
-		}
-		$(".address").text(Address == "" ? "Unknown" : Address);
-		$(".email").text(Email);
-		$(".phone").text(Phone == null ? "Unknown" : Phone);
-		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
-		$("#exampleModal").modal("show");
-	});
-});
 
 });
 
@@ -216,9 +295,9 @@ try{
 		} = JSON.parse(data);
 		$(".firstName").text(FirstName);
 		$(".lastName").text(LastName);
-		if (RoleName == "Admin") {
+		if (RoleName == "Admin" || RoleName == "admin") {
 			$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
-		} else if(RoleName == "User") {
+		} else if(RoleName == "User" || RoleName == "user") {
 			$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
 		} else {
 			$(".role").html("<span class='badge rounded-pill bg-secondary'>Guest</span>");

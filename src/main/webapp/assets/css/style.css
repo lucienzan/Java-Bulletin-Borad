@@ -73,3 +73,7 @@
     width: 200px;
     height: 200px;
  }
+ 
+ table tbody tr td:first-child{
+ 	 text-align: center;
+ }

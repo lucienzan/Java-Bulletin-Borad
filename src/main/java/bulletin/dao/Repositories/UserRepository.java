@@ -40,12 +40,10 @@ public class UserRepository implements IUserRepository {
 			sqlQuery = "SELECT * FROM user WHERE user.Active = true AND user.DeleteFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
-
 			while (resultSet.next()) {
 				User user = new User();
 				user.setId(resultSet.getString("Id"));
-				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
-				user.setFullName(resultSet.getString("FirstName") + " " + lastName);
+				user.setFullName(resultSet.getString("FirstName") + " " + resultSet.getString("LastName"));
 				user.setEmail(resultSet.getString("Email"));
 			    String roleId = resultSet.getString("RoleId");
 				user.setRoleId(roleId);
@@ -179,7 +177,7 @@ public class UserRepository implements IUserRepository {
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
-					model.setMessageName(Message.AccountSuccess);
+					model.setMessageName(Message.CreateSuccess);
 					model.setMessageType(Message.SUCCESS);
 				}
 			}

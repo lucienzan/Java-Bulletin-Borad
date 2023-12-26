@@ -45,7 +45,7 @@
     		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page"  href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>" >User</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link <%= request.getRequestURI().endsWith("post-list.jsp") ? "active" : "" %>" href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>">Post</a>
+          <a class="nav-link <%= request.getRequestURI().endsWith("post-list.jsp") ? "active" : "" %>" href="<%= request.getContextPath() + "/Views/Post/post-list.jsp" %>">Post</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
