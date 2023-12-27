@@ -27,9 +27,7 @@ import bulletin.models.User;
 import bulletin.services.UserService;
 
 @WebServlet("/")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-maxFileSize = 1024 * 1024 * 10, // 10MB
-maxRequestSize = 1024 * 1024 * 50)
+@MultipartConfig
 public class UserController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -120,28 +118,18 @@ public class UserController extends HttpServlet {
 	private void CreateUser(HttpServletRequest request, HttpServletResponse response) {
 		try {
             response.setContentType("text/html;charset=UTF-8");
-            
-        	 Part part = request.getPart("profile");
-             String fileName = "user.png";
-             
-     		if(part != null && part.getSize() > 0) {
-     			 fileName = ExtractFileName(part);
-     			 boolean isAllowExtension =  CheckExtension(fileName);
-     		     if(isAllowExtension == false) {
-     		    	request.setAttribute("fileError", Message.FileTypeError);
-     				request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
-     				return;
-     		     }
-     		}
-     		
      		boolean errorExist = this.Validation(request, response);
-     		
+            String fileName = "user.png";
+   		
      		HttpSession session = request.getSession(false);
      		User user= (User) session.getAttribute("userManager");
 
     		if (errorExist) {
     			request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
     		} else {
+    			 Part part = request.getPart("profile");
+                 fileName = ExtractFileName(part);
+
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
     			String lastName = request.getParameter("lastName");
@@ -189,27 +177,11 @@ public class UserController extends HttpServlet {
 		try {
             response.setContentType("text/html;charset=UTF-8");
             
-        	 Part part = request.getPart("profile");
-             String fileName = "user.png";
-             
+	        String fileName = "user.png";
  			String id = request.getParameter("id");
  			String isProfileRoute = request.getParameter("isProfileRoute");
-             
-     		if(part != null && part.getSize() > 0) {
-     			 fileName = ExtractFileName(part);
-     			 boolean isAllowExtension =  CheckExtension(fileName);
-     		     if(isAllowExtension == false) {
-     		    	request.setAttribute("fileError", Message.FileTypeError);
-     	 			if(!isProfileRoute.contentEquals("true"))
-     	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
-     	 			else
-         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
-     		    	return;
-     		     }
-     		}
      		
      		boolean errorExist = this.Validation(request, response);
-     		
      		HttpSession session = request.getSession(false);
      		User user= (User) session.getAttribute("userManager");
 
@@ -219,6 +191,8 @@ public class UserController extends HttpServlet {
  	 			else
      		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     		} else {
+   	    	 	Part part = request.getPart("profile");
+    			fileName = ExtractFileName(part);
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
     			String lastName = request.getParameter("lastName");
@@ -290,7 +264,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-	private boolean Validation(HttpServletRequest request, HttpServletResponse response) {
+	private boolean Validation(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
@@ -301,6 +275,7 @@ public class UserController extends HttpServlet {
 		String dob = request.getParameter("dob");
 		String address = request.getParameter("address");
 		String phone = request.getParameter("phone");
+   	 	Part part = request.getPart("profile");
 
 		// fistName check
 		if (firstName.contentEquals("")) {
@@ -366,16 +341,32 @@ public class UserController extends HttpServlet {
 		}
 
 		// birthday check
-		if (dob.contentEquals("")) {
-			request.setAttribute("dobError", Message.RDOB);
+		if (!dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			request.setAttribute("dobError", Message.FDOB);
 			error = true;
 		}
-		
+				
 		// address check
 		if (!lastName.contentEquals("") && address.length() > 100) {
 			request.setAttribute("addressError", Message.LAddress);
 			error = true;
 		}
+		
+		// profile check
+		if(part.getSize() == 0) {
+			request.setAttribute("fileError", Message.RFile);
+			error = true;
+		}else if (part.getSize() > 1024 * 1024 * 10) {
+	         request.setAttribute("fileError", Message.FileSize);
+	        error = true;
+	    }else {
+	    	 String fileName = ExtractFileName(part);
+ 			 boolean isAllowExtension =  CheckExtension(fileName);
+ 			 if(isAllowExtension == false) {
+ 				request.setAttribute("fileError", Message.FileTypeError);
+ 				error = true;
+ 			 }
+	    }
 
 		return error;
 	}

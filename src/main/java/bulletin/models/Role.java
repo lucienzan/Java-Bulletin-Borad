@@ -12,7 +12,6 @@ public class Role {
 		List<Role> roles = new ArrayList<Role>();
 		roles.add(new Role("056e4f7d-927a-498c-898a-5dbe68480c1c", "Admin"));
 		roles.add(new Role("06e3fda9-3b4a-4393-8c9c-b454851d98fa", "User"));
-		roles.add(new Role("70962a93-3e48-4bc6-8e95-ac0742539b18", "Guest"));
 		this.setRoleList(roles);
 	}
 

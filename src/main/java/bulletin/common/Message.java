@@ -35,11 +35,12 @@ public class Message {
     public static String LAddress = "Address words length less than 100.";
     public static String RPhone = "Phone field is required.";
     public static String FPhone = "Phone's format is incorrect.";
-    public static String RDOB = "Birthday Date filed is required.";
+    public static String FDOB = "Invalid date format.";
     public static String FPassword = "Password's format is incorrect.";
     public static String FEmail = "Email's format is incorrect.";
     public static String AccountDelete = "User account is deleted.";
     public static String FileTypeError = "File's extension does not support.";
+    public static String FileSize = "File size exceeds the maximum allowed size (10MB).";
     
     // Role
     public static String RRole = "Role field is required.";
@@ -49,6 +50,8 @@ public class Message {
     public static String RDescription = "Description field is required.";
     public static String LTitle = "Title words length must be less than 150.";
     public static String LDescription = "Description words length must be less than 350.";
+    public static String RFile = "File input field is required.";
+    public static String TitleExist = "Title is already used.";
 
     // SQL Error
     public static String SError = "Either server or sql is failed.";

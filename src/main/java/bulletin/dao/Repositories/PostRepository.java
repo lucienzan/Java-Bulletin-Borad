@@ -33,6 +33,7 @@ public class PostRepository implements IPostRepository{
 				post.setDescription(resultSet.getString("Description"));
 				post.setIsPublished(resultSet.getBoolean("IsPublished"));
 				post.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
+				post.setCreatedUserId(resultSet.getString("CreatedUserId"));
 				postList.add(post);
 			}
 
@@ -89,7 +90,7 @@ public class PostRepository implements IPostRepository{
 			resultSet.next();
 			
 		    if (resultSet.getInt(1) > 0) {
-		    	model.setMessageName(Message.AccountExist);
+		    	model.setMessageName(Message.TitleExist);
 				model.setMessageType(Message.EXIST);
 		    } else {
 		    	sqlQuery = "INSERT INTO post (Id,Title,Description,IsPublished,DeletedFlag,CreatedUserId,CreatedDate) VALUES (?,?,?,?,?,?,?)";

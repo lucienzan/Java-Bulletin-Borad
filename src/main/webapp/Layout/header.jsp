@@ -28,6 +28,7 @@
 		userManager = (User) session.getAttribute("userManager");
 	    userInfo.setId(userManager.getId());
 	    userInfo.setFirstName(userManager.getFirstName());
+	    userInfo.setRoleName(userManager.getRoleName());
 	}
 	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HTTP 1.1
 %>

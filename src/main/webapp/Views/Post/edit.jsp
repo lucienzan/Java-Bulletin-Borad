@@ -19,7 +19,7 @@
     <div class="row justify-content-center algin-items-center">
         <div class="col col-12 col-md-8 col-lg-6">
             <h3 class="my-4">Edit Post</h3>
-            <form method="Post" class="g-3" action="<%= request.getContextPath() + "/PostController"%>">
+            <form method="Post" class="g-3" action="<%= request.getContextPath() + "/PostController/post-edit"%>">
             	<input type="hidden" name="id" value="${ post.getId() }">
             	
                     <div class="mb-3">

@@ -1,6 +1,14 @@
 		</div>
 	</div>
 </div>
+<footer class="border-top footer text-muted">
+        <div class="container d-flex justify-content-between">
+           <p class="pt-3 fw-bold">
+           		<a class="text-decoration-none text-secondary" href="<%= request.getContextPath() %>">METATEAM MYANMAR</a>
+           </p>
+           <p class="pt-3"> &copy; 2023 - Bulletin Board </p>
+        </div>
+ </footer>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script

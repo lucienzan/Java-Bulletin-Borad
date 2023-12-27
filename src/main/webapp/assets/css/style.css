@@ -1,5 +1,16 @@
 @charset "UTF-8";
 
+body {
+   min-height: 100vh;
+   margin: 0;
+   display: flex;
+   flex-direction: column;
+}
+
+footer {
+ margin-block-start: auto;
+}
+
 .main-container {
   height: 100vh;
 }
@@ -20,6 +31,10 @@
 
 .login-img {
 	vertical-align: bottom;
+}
+
+#previewImage {
+	display: none;
 }
 
 .cc-tag {
@@ -63,6 +78,10 @@
   
   div.dataTables_wrapper div.dataTables_length select {
     width: 68px !important;
+  }
+  
+  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+  	margin-bottom: 15px;
   }
   
   .profileImg {

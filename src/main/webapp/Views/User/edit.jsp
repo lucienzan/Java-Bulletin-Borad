@@ -73,12 +73,15 @@
                     <div class="col-12 col-md-6 mb-3">
                         <label for="role" class="form-label">Role</label>
                         <span class="text-danger fw-bold">*</span>
-                        <select class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}" name="roleId">
+                        <select ${ userinfo.getRoleName() != "admin" ? "disabled" : "" } class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}" name="roleId">
                             <option selected disabled value="">Choose a role</option>
                         	<c:forEach var="role" items="${roles.getRoleList()}">
-                        	  <option value="${ role.getId() }" ${userModel.getRoleId() eq role.getId() ? 'selected' : ''}><c:out value="${role.getName()}"></c:out></option>
+                        	  <option value="${ role.getId() }"  ${userModel.getRoleId() eq role.getId() || param.roleId eq role.getId() ? 'selected' : ''}><c:out value="${role.getName()}"></c:out></option>
                         	</c:forEach>
                         </select>
+                        <c:if test="${ userinfo.getRoleName() != 'admin' }">
+                        	<input type="hidden" name="roleId" value="${ userModel.getRoleId() }">
+                        </c:if>
                         <c:if test="${requestScope.roleError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.roleError}" />
@@ -87,13 +90,12 @@
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="dob" class="form-label">Birthday Date</label>
-                        <span class="text-danger fw-bold">*</span>
 						<c:choose>
 						       <c:when test="${empty userModel.getDOB()}">
-						           <input type="date" required name="dob" id="dob" value="${param.dob}" class="form-control rounded">
+						           <input type="date" name="dob" id="dob" value="${param.dob}" class="form-control rounded">
 						       </c:when>
 						       <c:otherwise>
-						           <input type="date" required name="dob" id="dob" value='<fmt:formatDate pattern="yyyy-MM-dd" value="${userModel.getDOB()}"/>' class="form-control rounded">
+						           <input type="date" name="dob" id="dob" value='<fmt:formatDate pattern="yyyy-MM-dd" value="${userModel.getDOB()}"/>' class="form-control rounded">
 						       </c:otherwise>
 						   </c:choose>   
 						   <c:if test="${requestScope.dobError != null}">
@@ -106,12 +108,14 @@
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="profile" class="form-label">Profile</label>
-                        <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile">
+                        <span class="text-danger fw-bold">*</span>
+                        <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile" onchange="fileSelect()">
                         <c:if test="${requestScope.fileError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.fileError}" />
 							</div>
 						</c:if>
+						<img alt="review picture" id="previewImage" width="100" height="100" class="rounded mt-2" src="">
 						<c:if test="${not empty userModel.getOldProfile() }">
                        	 <span class="d-block">
                        	 <small>current profile - </small>
@@ -131,7 +135,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center align-items-center">
+                <div class="row justify-content-center align-items-center mb-3">
                     <button type="submit" class="btn btn-primary me-4 col-3 col-md-2 col-lg-1">Update</button>
                     <a class="btn btn-secondary col-3 col-md-2 col-lg-1" href="<%= request.getContextPath()+"/UserController"%>">Cancel</a>
                 </div>

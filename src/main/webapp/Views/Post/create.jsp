@@ -17,7 +17,7 @@
     <div class="row justify-content-center algin-items-center">
         <div class="col col-12 col-md-8 col-lg-6">
             <h3 class="my-4">Create New Post</h3>
-            <form method="Post" class="g-3" action="<%= request.getContextPath() + "/PostController"%>">
+            <form enctype="multipart/form-data" method="Post" class="g-3" action="<%= request.getContextPath() + "/PostController/post-create"%>">
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
                         <span class="text-danger fw-bold">*</span>

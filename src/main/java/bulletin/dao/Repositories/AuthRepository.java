@@ -9,6 +9,7 @@ import bulletin.common.DbConnection;
 import bulletin.common.Message;
 import bulletin.dao.IRepositories.IAuthRepository;
 import bulletin.models.ResponseModel;
+import bulletin.models.Role;
 import bulletin.models.User;
 
 public class AuthRepository implements IAuthRepository {
@@ -17,6 +18,13 @@ public class AuthRepository implements IAuthRepository {
 
 	public ResponseModel Register(User obj) {
 		ResponseModel model = new ResponseModel();
+		Role role =  new Role();
+
+		var userRoleId = role.getRoleList().stream()
+                .filter(r -> "User".equals(r.getName()))
+                .map(Role::getId)
+                .findFirst()
+                .orElse(null);
 
 		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
@@ -38,7 +46,7 @@ public class AuthRepository implements IAuthRepository {
 				model.setMessageType(Message.EXIST);
 				
 			} else {
-				sqlQuery = "INSERT INTO user (Id,FirstName,Email,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
+				sqlQuery = "INSERT INTO user (Id,FirstName,Email,RoldId,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
 				sqlQuery += "VALUES (?,?,?,?,?,?,?)";
 				String generatedSecuredPasswordHash = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
 
@@ -46,10 +54,11 @@ public class AuthRepository implements IAuthRepository {
 				preparedStatement.setString(1, obj.getId());
 				preparedStatement.setString(2, obj.getFirstName());
 				preparedStatement.setString(3, obj.getEmail());
-				preparedStatement.setString(4, generatedSecuredPasswordHash);
-				preparedStatement.setString(5, obj.getCreatedUserId());
-				preparedStatement.setTimestamp(6, obj.getCreatedDate());
-				preparedStatement.setBoolean(7, false);
+				preparedStatement.setString(4, userRoleId);
+				preparedStatement.setString(5, generatedSecuredPasswordHash);
+				preparedStatement.setString(6, obj.getCreatedUserId());
+				preparedStatement.setTimestamp(7, obj.getCreatedDate());
+				preparedStatement.setBoolean(8, false);
 
 				int result = preparedStatement.executeUpdate();
 
@@ -72,6 +81,7 @@ public class AuthRepository implements IAuthRepository {
 	public ResponseModel Login(User obj) {
 		ResponseModel model = new ResponseModel();
 		User user = new User();
+		Role role = new Role();
 		
 		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
@@ -92,7 +102,16 @@ public class AuthRepository implements IAuthRepository {
 				user.setFirstName(resultSet.getString("FirstName"));
 				user.setDeletedFlag(resultSet.getBoolean("DeleteFlag"));
 				user.setActive(resultSet.getBoolean("Active"));
-				
+				user.setRoleId(resultSet.getString("RoleId"));
+				user.setPassword(resultSet.getString("Password"));
+				var roleName = role.getRoleList().stream()
+		                .filter(r -> user.getRoleId().equals(r.getId()))
+		                .map(Role::getName)
+		                .findFirst()
+		                .orElse(null);
+				user.setRoleName(roleName);
+			}
+			
 				if(user.isDeletedFlag()) {
 					model.setMessageName(Message.AccountNotFound);
 					model.setMessageType(Message.EXIST);
@@ -102,8 +121,9 @@ public class AuthRepository implements IAuthRepository {
 					model.setMessageType(Message.FAIL);
 				}else {
 
-					boolean matched = BCrypt.checkpw(obj.getPassword(), resultSet.getString("Password"));
+					boolean matched = BCrypt.checkpw(obj.getPassword(), user.getPassword());
 					if(matched) {
+						user.setPassword("");
 						model.setUserModel(user);
 						model.setMessageName(Message.LoginSuccess);
 						model.setMessageType(Message.SUCCESS);
@@ -112,7 +132,7 @@ public class AuthRepository implements IAuthRepository {
 						model.setMessageType(Message.FAIL);
 					}
 				}
-			}
+			
 		}catch (Exception e) {
 			model.setMessageName(Message.LoginFail);
 			model.setMessageType(Message.FAIL);

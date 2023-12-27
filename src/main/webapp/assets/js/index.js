@@ -28,11 +28,8 @@ $("#userList").DataTable({
 				if (full.RoleId == "Admin" || full.RoleId == "admin") {
 					str = `<span class='badge rounded-pill bg-primary'>${full.RoleId}</span>`;
 				} else if (full.RoleId == "User" || full.RoleId == "user") {
-					str = `<span class='badge rounded-pill bg-danger'>${full.RoleId}</span>`;
-				} else {
 					str = `<span class='badge rounded-pill bg-secondary'>${full.RoleId}</span>`;
 				}
-
 				return str;
 			}
 		},
@@ -121,11 +118,9 @@ $("table tbody").on("click", "#detailUserBtn", function() {
 		$(".firstName").text(FirstName);
 		$(".lastName").text(LastName);
 		if (RoleName == "Admin" || RoleName == "admin") {
-			$(".role").html("<span class='badge rounded-pill bg-success'>Admin</span>");
+			$(".role").html("<span class='badge rounded-pill bg-primary'>Admin</span>");
 		} else if (RoleName == "User" || RoleName == "user") {
-			$(".role").html("<span class='badge rounded-pill bg-primary'>User</span>");
-		} else {
-			$(".role").html("<span class='badge rounded-pill bg-secondary'>Guest</span>");
+			$(".role").html("<span class='badge rounded-pill bg-secondary'>User</span>");
 		}
 		$(".address").text(Address == "" ? "Unknown" : Address);
 		$(".email").text(Email);
@@ -307,6 +302,22 @@ function showToast(icon, mesg) {
 		icon: icon,
 		title: mesg
 	})
+}
+
+function fileSelect() {
+    const fileInput = document.getElementById('profile');
+    const previewImage = document.getElementById('previewImage');
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = "block";
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);
+    }
 }
 
 try{

@@ -106,8 +106,7 @@
                     </div>
                     <div class="col-12 col-md-6 mb-3">
                         <label for="dob" class="form-label">Date Of Birth</label>
-                        <span class="text-danger fw-bold">*</span>
-                        <input type="date" required name="dob" id="dob" value="${param.dob}" class="form-control rounded ${not empty requestScope.dobError ? 'is-invalid' : ''}">
+                        <input type="date" name="dob" id="dob" value="${param.dob}" class="form-control rounded ${not empty requestScope.dobError ? 'is-invalid' : ''}">
                         <c:if test="${requestScope.dobError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.dobError}" />
@@ -118,12 +117,14 @@
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="profile" class="form-label">Profile</label>
-                        <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile">
+                        <span class="text-danger fw-bold">*</span>
+                        <input required accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile" onchange="fileSelect()">
                         <c:if test="${requestScope.fileError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.fileError}" />
 							</div>
 						</c:if>
+						<img alt="review picture" id="previewImage" width="100" height="100" class="rounded mt-2" src="">
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-4">
@@ -137,7 +138,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center align-items-center">
+                <div class="row justify-content-center align-items-center mb-3">
                     <button type="submit" class="btn btn-primary me-4 col-3 col-md-2 col-lg-1">Create</button>
                     <a class="btn btn-secondary col-3 col-md-2 col-lg-1" href="<%= request.getContextPath()+"/UserController"%>">Cancel</a>
                 </div>
