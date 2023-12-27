@@ -1,5 +1,12 @@
 <title>Bulletin Board | User List</title>
+
 <%@ include file="/Layout/header.jsp" %>
+<% 
+if(userInfo.getRoleName() != null){
+	if(userInfo.getRoleName().contentEquals("User"))
+	response.sendRedirect(request.getContextPath());
+}
+%>
 		<div>
 		<div class="mb-3 d-flex justify-content-between align-items-center">
 			<h3>User List</h3>

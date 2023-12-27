@@ -276,6 +276,7 @@ public class UserController extends HttpServlet {
 		String address = request.getParameter("address");
 		String phone = request.getParameter("phone");
    	 	Part part = request.getPart("profile");
+   	 	String url = request.getRequestURL().toString();
 
 		// fistName check
 		if (firstName.contentEquals("")) {
@@ -353,13 +354,13 @@ public class UserController extends HttpServlet {
 		}
 		
 		// profile check
-		if(part.getSize() == 0) {
+		if(part.getSize() == 0 && url.endsWith("user-create") && url.endsWith("updateUser")) {
 			request.setAttribute("fileError", Message.RFile);
 			error = true;
 		}else if (part.getSize() > 1024 * 1024 * 10) {
 	         request.setAttribute("fileError", Message.FileSize);
 	        error = true;
-	    }else {
+	    }else if(url.endsWith("user-create") && url.endsWith("updateUser")) {
 	    	 String fileName = ExtractFileName(part);
  			 boolean isAllowExtension =  CheckExtension(fileName);
  			 if(isAllowExtension == false) {

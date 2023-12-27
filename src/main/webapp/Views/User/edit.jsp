@@ -1,4 +1,10 @@
 <%@ include file="/Layout/header.jsp" %>
+<% 
+if(userInfo.getRoleName() != null){
+	if(userInfo.getRoleName().contentEquals("User"))
+	response.sendRedirect(request.getContextPath());
+}
+%>
 <jsp:useBean id="userModel" class="bulletin.models.User" scope="request"></jsp:useBean>
 <jsp:useBean id="roles" class="bulletin.models.Role" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
@@ -108,7 +114,6 @@
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="profile" class="form-label">Profile</label>
-                        <span class="text-danger fw-bold">*</span>
                         <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile" onchange="fileSelect()">
                         <c:if test="${requestScope.fileError != null}">
 							<div class="invalid-feedback">

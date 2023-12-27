@@ -48,8 +48,8 @@ public class Message {
     // Post
     public static String RTitle = "Title field is required.";
     public static String RDescription = "Description field is required.";
-    public static String LTitle = "Title words length must be less than 150.";
-    public static String LDescription = "Description words length must be less than 350.";
+    public static String LTitle = "Title words length must be less than 225.";
+    public static String LDescription = "Description words length must be less than 1000.";
     public static String RFile = "File input field is required.";
     public static String TitleExist = "Title is already used.";
 

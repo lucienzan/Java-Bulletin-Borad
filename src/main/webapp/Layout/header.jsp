@@ -42,9 +42,11 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <li class="nav-item">
+      	<c:if test="${ userInfo.getRoleName() != 'User' }">
+      	<li class="nav-item">
     		<a class="nav-link <%= request.getRequestURI().endsWith("user-list.jsp") ? "active" : "" %>" aria-current="page"  href="<%= request.getContextPath() + "/Views/User/user-list.jsp" %>" >User</a>
         </li>
+      	</c:if>
         <li class="nav-item">
           <a class="nav-link <%= request.getRequestURI().endsWith("post-list.jsp") ? "active" : "" %>" href="<%= request.getContextPath() + "/Views/Post/post-list.jsp" %>">Post</a>
         </li>

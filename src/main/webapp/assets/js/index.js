@@ -5,6 +5,7 @@ jQuery(document).ready(function($) {
 $("#userList").DataTable({
 	"processing": true,
 	"bDestroy": true,
+	"pageLength": 10,
 	"ajax": {
 		"url": "/BulletinOJT/UserController",
 		"type": "GET",
@@ -122,7 +123,7 @@ $("table tbody").on("click", "#detailUserBtn", function() {
 		} else if (RoleName == "User" || RoleName == "user") {
 			$(".role").html("<span class='badge rounded-pill bg-secondary'>User</span>");
 		}
-		$(".address").text(Address == "" ? "Unknown" : Address);
+		$(".address").text(Address == null ? "Unknown" : Address);
 		$(".email").text(Email);
 		$(".phone").text(Phone == null ? "Unknown" : Phone);
 		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
@@ -134,6 +135,7 @@ $("table tbody").on("click", "#detailUserBtn", function() {
 $("#postList").DataTable({
 	"processing": true,
 	"bDestroy": true,
+	"pageLength": 10,
 	"ajax": {
 		"url": "/BulletinOJT/PostController",
 		"type": "GET",
@@ -344,7 +346,7 @@ try{
 		} else {
 			$(".role").html("<span class='badge rounded-pill bg-secondary'>Guest</span>");
 		}
-		$(".address").text(Address == "" ? "Unknown" : Address);
+		$(".address").text(Address == null ? "Unknown" : Address);
 		$(".email").text(Email);
 		$(".phone").text(Phone == null ? "Unknown" : Phone);
 		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));

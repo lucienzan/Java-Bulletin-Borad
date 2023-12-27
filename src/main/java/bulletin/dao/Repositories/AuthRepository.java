@@ -46,19 +46,20 @@ public class AuthRepository implements IAuthRepository {
 				model.setMessageType(Message.EXIST);
 				
 			} else {
-				sqlQuery = "INSERT INTO user (Id,FirstName,Email,RoldId,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
-				sqlQuery += "VALUES (?,?,?,?,?,?,?)";
+				sqlQuery = "INSERT INTO user (Id,FirstName,Email,Profile,RoleId,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
+				sqlQuery += "VALUES (?,?,?,?,?,?,?,?,?)";
 				String generatedSecuredPasswordHash = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
 
 				preparedStatement = con.prepareStatement(sqlQuery);
 				preparedStatement.setString(1, obj.getId());
 				preparedStatement.setString(2, obj.getFirstName());
 				preparedStatement.setString(3, obj.getEmail());
-				preparedStatement.setString(4, userRoleId);
-				preparedStatement.setString(5, generatedSecuredPasswordHash);
-				preparedStatement.setString(6, obj.getCreatedUserId());
-				preparedStatement.setTimestamp(7, obj.getCreatedDate());
-				preparedStatement.setBoolean(8, false);
+				preparedStatement.setString(4, "user.png");
+				preparedStatement.setString(5, userRoleId);
+				preparedStatement.setString(6, generatedSecuredPasswordHash);
+				preparedStatement.setString(7, obj.getCreatedUserId());
+				preparedStatement.setTimestamp(8, obj.getCreatedDate());
+				preparedStatement.setBoolean(9, false);
 
 				int result = preparedStatement.executeUpdate();
 

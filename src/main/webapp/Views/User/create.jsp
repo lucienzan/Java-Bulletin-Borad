@@ -1,4 +1,10 @@
 <%@ include file="/Layout/header.jsp" %>
+<% 
+if(userInfo.getRoleName() != null){
+	if(userInfo.getRoleName().contentEquals("User"))
+	response.sendRedirect(request.getContextPath());
+}
+%>
 <jsp:useBean id="user" class="bulletin.models.User" scope="page"></jsp:useBean>
 <jsp:useBean id="roles" class="bulletin.models.Role" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>

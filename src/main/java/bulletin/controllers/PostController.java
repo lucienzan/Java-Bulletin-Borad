@@ -174,7 +174,8 @@ public class PostController extends HttpServlet {
 			boolean isAllowExtension = hasExcelExtension(fileName);
 			if (isAllowExtension == false) {
 				request.setAttribute("fileError", Message.FileTypeError);
-				request.getRequestDispatcher("/Views/Post/post-list.jsp").include(request, response);
+			} else if(part.getSize() > 1024 * 1024 * 2) {
+				request.setAttribute("fileError", Message.FileTypeError);
 			} else {
 				Post post = new Post();
 				HttpSession session = request.getSession(false);
@@ -218,8 +219,8 @@ public class PostController extends HttpServlet {
 			}
 		} else {
 			request.setAttribute("fileError", Message.RFile);
-			request.getRequestDispatcher("/Views/Post/post-list.jsp").include(request, response);
 		}
+		request.getRequestDispatcher("/Views/Post/post-list.jsp").include(request, response);
 	}
 
 	private void ExcelExport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
@@ -300,7 +301,7 @@ public class PostController extends HttpServlet {
 		if(title.isBlank()) {
 			request.setAttribute("titleError", Message.RTitle);
 			hasError = true;
-		}else if(title.length() > 150) {
+		}else if(title.length() > 225) {
 			request.setAttribute("titleError", Message.LTitle);
 			hasError = true;
 		}
@@ -309,7 +310,7 @@ public class PostController extends HttpServlet {
 		if(description.isBlank()) {
 			request.setAttribute("describeError", Message.RDescription);
 			hasError = true;
-		}else if(description.length() > 350) {
+		}else if(description.length() > 1000) {
 			request.setAttribute("describeError", Message.LDescription);
 			hasError = true;
 		}
