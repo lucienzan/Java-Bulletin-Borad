@@ -48,28 +48,29 @@ public class UserController extends HttpServlet {
 				this.getUserList(request, response);
 			} else if (url.endsWith("user-create")) {
 				this.getUser(request, response);
-			} else if(url.endsWith("user-detail")) {
-				this.getUserDetail(request,response);
-			} else if(url.endsWith("user-edit")) {
-				this.editUser(request,response);
-			} else if(url.endsWith("profile")) {
-				this.profile(request,response);
+			} else if (url.endsWith("user-detail")) {
+				this.getUserDetail(request, response);
+			} else if (url.endsWith("user-edit")) {
+				this.editUser(request, response);
+			} else if (url.endsWith("profile")) {
+				this.profile(request, response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void getUserDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 		User user = _userService.Get(id);
 		Gson gson = new GsonBuilder().serializeNulls().create();
 		String json = gson.toJson(user);
-		
+
 		response.getWriter().write(json);
 	}
-	
-	private void profile(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+	private void profile(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 		String id = request.getParameter("userId");
 		User user = _userService.Get(id);
 		request.setAttribute("userModel", user);
@@ -91,178 +92,148 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
 	}
-	
+
 	private void editUser(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			String userId = request.getParameter("userId");
 			User model = _userService.Get(userId);
 			model.setProfile("");
-			
+
 			request.setAttribute("userModel", model);
 			request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String url = request.getServletPath().toString(); 
-		if(url.endsWith("updateUser")) {
+		String url = request.getServletPath().toString();
+		if (url.endsWith("updateUser")) {
 			this.updateUser(request, response);
-		}else {
-			this.createUser(request,response);
+		} else {
+			this.createUser(request, response);
 		}
 	}
-	
+
 	private void createUser(HttpServletRequest request, HttpServletResponse response) {
 		try {
-            response.setContentType("text/html;charset=UTF-8");
-     		boolean errorExist = this.validation(request, response);
-            String fileName = "user.png";
-   		
-     		HttpSession session = request.getSession(false);
-     		User user= (User) session.getAttribute("userManager");
+			boolean errorExist = this.validation(request, response);
+			String fileName = "user.png";
 
-    		if (errorExist) {
-    			request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
-    		} else {
-    			 Part part = request.getPart("profile");
-                 fileName = extractFileName(part);
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
 
-    			String email = request.getParameter("email");
-    			String firstName = request.getParameter("firstName");
-    			String lastName = request.getParameter("lastName");
-    			String roleId = request.getParameter("roleId");
-    			String address = request.getParameter("address");
-    			String phone = request.getParameter("phone");
-    			String password = request.getParameter("password");
-    			String profile = fileName;
+			if (errorExist) {
+				request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
+			} else {
+				Part part = request.getPart("profile");
+				fileName = extractFileName(part);
 
-    			UUID randomIdUuid = UUID.randomUUID();
-	            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
-    			String id = randomIdUuid.toString();
+				String id = UUID.randomUUID().toString();
+				String email = request.getParameter("email");
+				String firstName = request.getParameter("firstName");
+				String lastName = request.getParameter("lastName");
+				String roleId = request.getParameter("roleId");
+				String address = request.getParameter("address");
+				String phone = request.getParameter("phone");
+				String password = request.getParameter("password");
+				String profile = fileName;
+				Timestamp createdDate = new Timestamp(System.currentTimeMillis());
+				Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
 
-    			ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
-    					profile, phone, roleId, dob, createdDate, user.getId()));
-    			ServletContext context = getServletContext();  
-    			String dir = context.getInitParameter("fileDir");  
-    			
-    			if(model.getMessageType() == Message.SUCCESS) {
-    				
-    		        if(!fileName.contentEquals("user.png")) {
-    		        	File fileUploadDirectory = new File(dir);
-        		        if (!fileUploadDirectory.exists()) {
-        		            fileUploadDirectory.mkdirs();
-        		        }
-        		        
-        		        String savePath = dir + File.separator + fileName;
-        		        part.write(savePath);
-    		        }
-    		        
-    		        request.setAttribute("model", model);
-    				request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response); 
-    			}else {
-    				request.setAttribute("model", model);
-    				request.getRequestDispatcher("/Views/User/create.jsp").include(request, response); 
-    			}
-    		}
+				ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
+						profile, phone, roleId, dob, createdDate, user.getId()));
+				ServletContext context = getServletContext();
+				String dir = context.getInitParameter("fileDir");
+
+				if (model.getMessageType() == Message.SUCCESS) {
+					if (!fileName.contentEquals("user.png")) {
+						File fileUploadDirectory = new File(dir);
+						if (!fileUploadDirectory.exists()) {
+							fileUploadDirectory.mkdirs();
+						}
+						String savePath = dir + File.separator + fileName;
+						part.write(savePath);
+					}
+
+					request.setAttribute("model", model);
+					request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
+				} else {
+					request.setAttribute("model", model);
+					request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
-	private void updateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	private void updateUser(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		try {
-            response.setContentType("text/html;charset=UTF-8");
-            
-	        String fileName = "user.png";
- 			String id = request.getParameter("id");
- 			String isProfileRoute = request.getParameter("isProfileRoute");
-     		
-     		boolean errorExist = this.validation(request, response);
-     		HttpSession session = request.getSession(false);
-     		User user= (User) session.getAttribute("userManager");
+			String fileName = "user.png";
+			boolean errorExist = this.validation(request, response);
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
 
-    		if (errorExist) {
- 	 			if(isProfileRoute == null)
- 	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
- 	 			else
-     		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
-    		} else {
-   	    	 	Part part = request.getPart("profile");
-    			fileName = part.getSize() != 0 ? extractFileName(part) : fileName;
-    			String email = request.getParameter("email");
-    			String firstName = request.getParameter("firstName");
-    			String lastName = request.getParameter("lastName");
-    			String roleId = request.getParameter("roleId");
-    			String address = request.getParameter("address");
-    			String phone = request.getParameter("phone");
-    			String oldProfile = request.getParameter("oldProfile");
-	            Timestamp updateDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+			if (errorExist) {
+					request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+			} else {
+				Part part = request.getPart("profile");
+				fileName = part.getSize() != 0 ? extractFileName(part) : fileName;
+				String id = request.getParameter("id");
+				String email = request.getParameter("email");
+				String firstName = request.getParameter("firstName");
+				String lastName = request.getParameter("lastName");
+				String roleId = request.getParameter("roleId");
+				String address = request.getParameter("address");
+				String phone = request.getParameter("phone");
+				String oldProfile = request.getParameter("oldProfile");
+				Timestamp updateDate = new Timestamp(System.currentTimeMillis());
+				Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
 
-    			ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address,
-    					fileName, phone, roleId, dob, updateDate, user.getId(), oldProfile));
-    			ServletContext context = getServletContext();  
-    			String dir = context.getInitParameter("fileDir");  
-    			
-    			if(model.getMessageType() == Message.SUCCESS) {
-    				
-    		        if(!fileName.contentEquals("user.png")) {
-    		        	File fileUploadDirectory = new File(dir);
-        		        if (!fileUploadDirectory.exists()) {
-        		            fileUploadDirectory.mkdirs();
-        		        }
-        		        
-        		        String savePath = dir + File.separator + fileName;
-        		        part.write(savePath);
-    		        }
-    		        
-    		        request.setAttribute("model", model);
-     	 			if(isProfileRoute == null)
-     	 				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
-     	 			else
-     	 				request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
-    			}else {
-    				request.setAttribute("model", model);
-     	 			if(isProfileRoute == null)
-     	 				request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
-     	 			else
-         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
-    			}
-    		}
+				ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address, fileName,
+						phone, roleId, dob, updateDate, user.getId(), oldProfile));
+				ServletContext context = getServletContext();
+				String dir = context.getInitParameter("fileDir");
+				
+				if (model.getMessageType() == Message.SUCCESS) {
+					if (!fileName.contentEquals("user.png")) {
+						File fileUploadDirectory = new File(dir);
+						if (!fileUploadDirectory.exists()) {
+							fileUploadDirectory.mkdirs();
+						}
+						String savePath = dir + File.separator + fileName;
+						part.write(savePath);
+					}
+
+					request.setAttribute("model", model);
+					request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
+				} else {
+					request.setAttribute("model", model);
+					request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
+		}
 	}
-	
-	private String extractFileName(Part part) {
-	        String contentDisp = part.getHeader("content-disposition");
-	        String[] items = contentDisp.split(";");
-	        UUID uuid = UUID.randomUUID();
-	        for (String s : items) {
-	            if (s.trim().startsWith("filename")) {
-	                return "img_"+uuid+s.substring(s.indexOf("=") + 2, s.length() - 1);
-	            }
-	        }
-	        return "";
-	    }
-	
-	private static Timestamp convertStringToTimestamp(String inputDateStr) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            java.util.Date parsedDate =  dateFormat.parse(inputDateStr);
-            return new Timestamp(parsedDate.getTime());
-            
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null; 
-        }
-    }
 
-	private boolean validation(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	private static Timestamp convertStringToTimestamp(String inputDateStr) {
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			java.util.Date parsedDate = dateFormat.parse(inputDateStr);
+			return new Timestamp(parsedDate.getTime());
+
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	private boolean validation(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
@@ -273,8 +244,8 @@ public class UserController extends HttpServlet {
 		String dob = request.getParameter("dob");
 		String address = request.getParameter("address");
 		String phone = request.getParameter("phone");
-   	 	Part part = request.getPart("profile");
-   	 	String url = request.getRequestURL().toString();
+		Part part = request.getPart("profile");
+		String url = request.getRequestURL().toString();
 
 		// fistName check
 		if (firstName.contentEquals("")) {
@@ -344,45 +315,57 @@ public class UserController extends HttpServlet {
 			request.setAttribute("dobError", Message.FDOB);
 			error = true;
 		}
-				
+
 		// address check
 		if (!lastName.contentEquals("") && address.length() > 100) {
 			request.setAttribute("addressError", Message.LAddress);
 			error = true;
 		}
-		
+
 		// profile check
-		if(part.getSize() == 0 && url.endsWith("user-create") && url.endsWith("updateUser")) {
+		if (part.getSize() == 0 && url.endsWith("user-create")) {
 			request.setAttribute("fileError", Message.RFile);
 			error = true;
-		}else if (part.getSize() > 1024 * 1024 * 10) {
-	         request.setAttribute("fileError", Message.FileSize);
-	        error = true;
-	    }else if(url.endsWith("user-create") && url.endsWith("updateUser")) {
-	    	 String fileName = extractFileName(part);
- 			 boolean isAllowExtension =  checkExtension(fileName);
- 			 if(isAllowExtension == false) {
- 				request.setAttribute("fileError", Message.FileTypeError);
- 				error = true;
- 			 }
-	    }
+		} else if (part.getSize() > 1024 * 1024 * 10) {
+			request.setAttribute("fileError", Message.FileSize);
+			error = true;
+		} else if (part.getSize() != 0 && part.getSize() < 1024 * 1024 * 10) {
+			String fileName = extractFileName(part);
+			boolean isAllowExtension = checkExtension(fileName);
+			if (isAllowExtension == false) {
+				request.setAttribute("fileError", Message.FileTypeError);
+				error = true;
+			}
+		}
 
 		return error;
 	}
+
+	private String extractFileName(Part part) {
+		String contentDisp = part.getHeader("content-disposition");
+		String[] items = contentDisp.split(";");
+		UUID uuid = UUID.randomUUID();
+		for (String s : items) {
+			if (s.trim().startsWith("filename")) {
+				return "img_" + uuid + s.substring(s.indexOf("=") + 2, s.length() - 1);
+			}
+		}
+		return "";
+	}
 	
 	private boolean checkExtension(String fileName) {
-		String [] allowExtesnions = {"png","jpeg","jpg"};
+		String[] allowExtesnions = { "png", "jpeg", "jpg" };
 		String getExtension = null;
 		int lastDotIndex = fileName.lastIndexOf('.');
-	    if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
-	    	getExtension = fileName.substring(lastDotIndex + 1).toLowerCase();
-	    }
-	   for (String extension : allowExtesnions) {
-		   if(extension.contentEquals(getExtension.toLowerCase())) {
-			   return true;
-		   }
-	   }
-	   return false;
+		if (lastDotIndex > 0 && lastDotIndex < fileName.length() - 1) {
+			getExtension = fileName.substring(lastDotIndex + 1).toLowerCase();
+		}
+		for (String extension : allowExtesnions) {
+			if (extension.contentEquals(getExtension.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
@@ -397,11 +380,10 @@ public class UserController extends HttpServlet {
 
 			JSONObject jsonData = new JSONObject(requestBody.toString());
 			String userId = jsonData.getString("id");
-     		HttpSession session = request.getSession(false);
-     		User user= (User) session.getAttribute("userManager");
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
 
-			ResponseModel model = _userService.Delete(userId,user.getId());
-
+			ResponseModel model = _userService.Delete(userId, user.getId());
 			JSONObject jsonResponse = new JSONObject();
 			jsonResponse.put("status", model.getMessageType());
 			jsonResponse.put("message", model.getMessageName());

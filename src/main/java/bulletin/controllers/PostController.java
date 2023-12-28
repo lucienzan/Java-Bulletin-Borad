@@ -34,61 +34,59 @@ import bulletin.services.PostService;
 @MultipartConfig
 public class PostController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    private PostService _postService;
+	private PostService _postService;
 
-    public PostController() {
-        super();
-    }
+	public PostController() {
+		super();
+	}
 
-    public void init() {
-    	_postService = new PostService(new PostRepository());
-    }
+	public void init() {
+		_postService = new PostService(new PostRepository());
+	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String url = request.getRequestURL().toString();
 		String contentType = request.getContentType();
-		
+
 		if (contentType == null && url.endsWith("PostController")) {
 			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		} else if (contentType != null && url.endsWith("PostController")) {
-			this.getAll(request,response);
+			this.getAll(request, response);
 		} else if (url.endsWith("post-detail")) {
-			this.showPost(request,response);
+			this.showPost(request, response);
 		} else if (url.endsWith("post-create")) {
-			this.createPost(request,response);
+			this.createPost(request, response);
 		} else if (url.endsWith("post-edit")) {
-			this.getPost(request,response);
+			this.getPost(request, response);
 		} else if (url.endsWith("excel-export")) {
-			this.excelExport(request,response);
+			this.excelExport(request, response);
 		}
 	}
 
 	private void getAll(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		Role role = new Role();
-		var userRoleId = role.getRoleList().stream()
-                .filter(r -> "User".equals(r.getName()))
-                .map(Role::getId)
-                .findFirst()
-                .orElse(null);
+		var userRoleId = role.getRoleList().stream().filter(r -> "User".equals(r.getName())).map(Role::getId)
+				.findFirst().orElse(null);
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute("userManager");
-		
+
 		List<Post> postList = _postService.GetAll();
-		if(user.getRoleId().contentEquals(userRoleId)) {
-			postList = postList.stream()
-					.filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
+		if (user.getRoleId().contentEquals(userRoleId)) {
+			postList = postList.stream().filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
 					.collect(Collectors.toList());
 		}
-		
+
 		Gson gson = new GsonBuilder().serializeNulls().create();
 		String json = gson.toJson(postList);
 
 		// Send the JSON response to the client
 		response.getWriter().write(json);
 	}
-	
-	private void getPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	private void getPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String id = request.getParameter("postId");
 		Post post = _postService.Get(id);
 		request.setAttribute("post", post);
@@ -99,15 +97,16 @@ public class PostController extends HttpServlet {
 			throws ServletException, IOException {
 		request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
 	}
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String url = request.getRequestURL().toString();
 
-		if(url.endsWith("excel-import")) {
-			this.excelImport(request,response);
-		}else if(url.endsWith("post-create")) {
-			this.insertPost(request,response);
-		}else if(url.endsWith("post-edit")) {
+		if (url.endsWith("excel-import")) {
+			this.excelImport(request, response);
+		} else if (url.endsWith("post-create")) {
+			this.insertPost(request, response);
+		} else if (url.endsWith("post-edit")) {
 			this.updatePost(request, response);
 		}
 	}
@@ -115,9 +114,9 @@ public class PostController extends HttpServlet {
 	private void insertPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		boolean hasError = validation(request);
-		if(hasError) {
+		if (hasError) {
 			request.getRequestDispatcher("/Views/Post/create.jsp").include(request, response);
-		}else {
+		} else {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute("userManager");
 			String id = UUID.randomUUID().toString();
@@ -125,27 +124,27 @@ public class PostController extends HttpServlet {
 			String description = request.getParameter("description");
 			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
 			Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-			ResponseModel model = _postService.Create(new Post(id,title,description,isPublished,createdDate,user.getId()));
+			ResponseModel model = _postService.Create(new Post(id, title, description, isPublished, createdDate, user.getId()));
 			request.setAttribute("model", model);
 			request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
 		}
 	}
-	
+
 	private void updatePost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		boolean hasError = validation(request);
-		if(hasError) {
+		if (hasError) {
 			request.getRequestDispatcher("/Views/Post/edit.jsp").include(request, response);
-		}else {
+		} else {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute("userManager");
-			Timestamp updatedDate = new Timestamp(System.currentTimeMillis());
 			Post post = new Post();
-			
+
 			post.setId(request.getParameter("id"));
 			post.setTitle(request.getParameter("title"));
 			post.setDescription(request.getParameter("description"));
 			boolean isPublished = request.getParameter("isPublished") != null ? true : false;
+			Timestamp updatedDate = new Timestamp(System.currentTimeMillis());
 			post.setIsPublished(isPublished);
 			post.setUpdatedDate(updatedDate);
 			post.setUpdatedUserId(user.getId());
@@ -155,16 +154,17 @@ public class PostController extends HttpServlet {
 			request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
 		}
 	}
-	
-	private void showPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	private void showPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String id = request.getParameter("id");
 		Post post = _postService.Get(id);
-		
+
 		Gson gson = new GsonBuilder().serializeNulls().create();
 		String obj = gson.toJson(post);
 		response.getWriter().write(obj);
 	}
-	
+
 	private void excelImport(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		Part part = request.getPart("importFile");
@@ -174,7 +174,7 @@ public class PostController extends HttpServlet {
 			boolean isAllowExtension = hasExcelExtension(fileName);
 			if (isAllowExtension == false) {
 				request.setAttribute("fileError", Message.FileTypeError);
-			} else if(part.getSize() > 1024 * 1024 * 2) {
+			} else if (part.getSize() > 1024 * 1024 * 2) {
 				request.setAttribute("fileError", Message.FileTypeError);
 			} else {
 				Post post = new Post();
@@ -194,29 +194,29 @@ public class PostController extends HttpServlet {
 					Cell descriptionCell = row.getCell(1);
 					Cell statusCell = row.getCell(2);
 					boolean status = false;
-					
-				    if (titleCell == null) {
-				        model.setMessageType(Message.FAIL);
-				        model.setMessageName(Message.RTitle);
-				        break;  
-				    }
-				    if (descriptionCell == null) {
-				        model.setMessageType(Message.FAIL);
-				        model.setMessageName(Message.RDescription);
-				        break;  
-				    }
-				    if(statusCell != null) {
+
+					if (titleCell == null) {
+						model.setMessageType(Message.FAIL);
+						model.setMessageName(Message.RTitle);
+						break;
+					}
+					if (descriptionCell == null) {
+						model.setMessageType(Message.FAIL);
+						model.setMessageName(Message.RDescription);
+						break;
+					}
+					if (statusCell != null) {
 						status = row.getCell(2).getStringCellValue().equalsIgnoreCase("Published") ? true : false;
 					}
-				    
-				    post.setId(UUID.randomUUID().toString());
-				    post.setTitle(row.getCell(0).getStringCellValue());
-				    post.setDescription(row.getCell(1).getStringCellValue());
-				    post.setIsPublished(status);
-				    post.setCreatedDate(createdDate);
-				    post.setCreatedUserId(user.getId());
-				    model = _postService.Create(post);
-				    i++;
+
+					post.setId(UUID.randomUUID().toString());
+					post.setTitle(row.getCell(0).getStringCellValue());
+					post.setDescription(row.getCell(1).getStringCellValue());
+					post.setIsPublished(status);
+					post.setCreatedDate(createdDate);
+					post.setCreatedUserId(user.getId());
+					model = _postService.Create(post);
+					i++;
 				}
 				workbook.close();
 
@@ -229,98 +229,94 @@ public class PostController extends HttpServlet {
 		request.getRequestDispatcher("/Views/Post/post-list.jsp").include(request, response);
 	}
 
-	private void excelExport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
+	private void excelExport(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
-        
+		response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
+
 		Role role = new Role();
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute("userManager");
-		var userRoleId = role.getRoleList().stream()
-                .filter(r -> "User".equals(r.getName()))
-                .map(Role::getId)
-                .findFirst()
-                .orElse(null);
-		
+		var userRoleId = role.getRoleList().stream().filter(r -> "User".equals(r.getName())).map(Role::getId)
+				.findFirst().orElse(null);
+
 		List<Post> posts = _postService.GetAll();
-		if(user.getRoleId().contentEquals(userRoleId)) {
-			posts = posts.stream()
-					.filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
+		if (user.getRoleId().contentEquals(userRoleId)) {
+			posts = posts.stream().filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
 					.collect(Collectors.toList());
 		}
-		
-		try (OutputStream out = response.getOutputStream();
-			XSSFWorkbook workbook = new XSSFWorkbook()) {
+
+		try (OutputStream out = response.getOutputStream(); XSSFWorkbook workbook = new XSSFWorkbook()) {
 			XSSFSheet sheet = workbook.createSheet("Sheet1");
 			XSSFRow headerRow = sheet.createRow(0);
-			
+
 			// Set header values
-	         headerRow.createCell(0).setCellValue("Title");
-	         headerRow.createCell(1).setCellValue("Description");
-	         headerRow.createCell(2).setCellValue("Status");
-	        
-            // Populate the sheet with data
-            int rowNum = 1;
-            for (Post post : posts) {
-                Row row = sheet.createRow(rowNum++);
-                int colNum = 0;
+			headerRow.createCell(0).setCellValue("Title");
+			headerRow.createCell(1).setCellValue("Description");
+			headerRow.createCell(2).setCellValue("Status");
 
-                Cell cellTitle = row.createCell(colNum++);
-                cellTitle.setCellValue(post.getTitle());
+			// Populate the sheet with data
+			int rowNum = 1;
+			for (Post post : posts) {
+				Row row = sheet.createRow(rowNum++);
+				int colNum = 0;
 
-                Cell cellDescription = row.createCell(colNum++);
-                cellDescription.setCellValue(post.getDescription());
-                
-                Cell cellStatus = row.createCell(colNum++);
-                cellStatus.setCellValue(post.isIsPublished() ? "Published" : "Unpublished");
-            }
+				Cell cellTitle = row.createCell(colNum++);
+				cellTitle.setCellValue(post.getTitle());
 
-            workbook.write(out);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+				Cell cellDescription = row.createCell(colNum++);
+				cellDescription.setCellValue(post.getDescription());
+
+				Cell cellStatus = row.createCell(colNum++);
+				cellStatus.setCellValue(post.isIsPublished() ? "Published" : "Unpublished");
+			}
+
+			workbook.write(out);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-	
+
 	private String extractFileName(Part part) {
-        String contentDisp = part.getHeader("content-disposition");
-        String[] items = contentDisp.split(";");
-        UUID uuid = UUID.randomUUID();
-        for (String s : items) {
-            if (s.trim().startsWith("filename")) {
-                return "img_"+uuid+s.substring(s.indexOf("=") + 2, s.length() - 1);
-            }
-        }
-        return "";
-    }
-	
-	private boolean hasExcelExtension(String fileName) {
-	    String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-	    return extension.equals("xls") || extension.equals("xlsx");
+		String contentDisp = part.getHeader("content-disposition");
+		String[] items = contentDisp.split(";");
+		UUID uuid = UUID.randomUUID();
+		for (String s : items) {
+			if (s.trim().startsWith("filename")) {
+				return "img_" + uuid + s.substring(s.indexOf("=") + 2, s.length() - 1);
+			}
+		}
+		return "";
 	}
-	
+
+	private boolean hasExcelExtension(String fileName) {
+		String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+		return extension.equals("xls") || extension.equals("xlsx");
+	}
+
 	private boolean validation(HttpServletRequest request) {
 		boolean hasError = false;
 		String title = request.getParameter("title");
 		String description = request.getParameter("description");
-		
+
 		// Title
-		if(title.isBlank()) {
+		if (title.isBlank()) {
 			request.setAttribute("titleError", Message.RTitle);
 			hasError = true;
-		}else if(title.length() > 225) {
+		} else if (title.length() > 225) {
 			request.setAttribute("titleError", Message.LTitle);
 			hasError = true;
 		}
-		
+
 		// Description
-		if(description.isBlank()) {
+		if (description.isBlank()) {
 			request.setAttribute("describeError", Message.RDescription);
 			hasError = true;
-		}else if(description.length() > 1000) {
+		} else if (description.length() > 1000) {
 			request.setAttribute("describeError", Message.LDescription);
 			hasError = true;
 		}
-		
+
 		return hasError;
 	}
 
@@ -336,11 +332,10 @@ public class PostController extends HttpServlet {
 
 			JSONObject jsonData = new JSONObject(requestBody.toString());
 			String postId = jsonData.getString("id");
-     		HttpSession session = request.getSession(false);
-     		User user= (User) session.getAttribute("userManager");
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute("userManager");
 
-			ResponseModel model = _postService.Delete(postId,user.getId());
-
+			ResponseModel model = _postService.Delete(postId, user.getId());
 			JSONObject jsonResponse = new JSONObject();
 			jsonResponse.put("status", model.getMessageType());
 			jsonResponse.put("message", model.getMessageName());

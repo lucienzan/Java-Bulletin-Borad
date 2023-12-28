@@ -1,15 +1,15 @@
 <title>Bulletin Board | User Edit</title>
 <%@ include file="/Layout/header.jsp" %>
-<% 
-if(userInfo.getRoleName() != null){
-	if(userInfo.getRoleName().contentEquals("User"))
-	response.sendRedirect(request.getContextPath());
-}
-%>
 <jsp:useBean id="userModel" class="bulletin.models.User" scope="request"></jsp:useBean>
 <jsp:useBean id="roles" class="bulletin.models.Role" scope="page"></jsp:useBean>
 <jsp:useBean id="model" class="bulletin.models.ResponseModel" scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="userModel"/>
+<% 
+if(userInfo.getRoleName() != null){
+	if(userInfo.getRoleName().contentEquals("User") && !userInfo.getId().equals(userModel.getId()))
+	response.sendRedirect(request.getContextPath());
+}
+%>
 <div>
 	<c:choose>
 		<c:when test="${ model.getMessageType() == 2 }">

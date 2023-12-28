@@ -82,17 +82,14 @@ public class AccountController extends HttpServlet {
 
 	private void register(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		User user = new User();
-
 		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("/register.jsp").include(request, response);
 		} else {
-			UUID randomIdUuid = UUID.randomUUID();
 			Timestamp createDate = new Timestamp(System.currentTimeMillis());
-			String id = randomIdUuid.toString();
-			int getTarget = request.getParameter("email").toString().indexOf("@");
+			String id = UUID.randomUUID().toString();
+			int getTarget = request.getParameter("email").toString().lastIndexOf("@");
 			String firstName = request.getParameter("email").toString().substring(0, getTarget);
 
 			user.setId(id);

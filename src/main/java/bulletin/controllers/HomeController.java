@@ -11,12 +11,10 @@ import java.io.IOException;
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-
     public HomeController() {
         super();
         // TODO Auto-generated constructor stub
     }
-
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		HttpSession session = request.getSession(false);
@@ -24,7 +22,6 @@ public class HomeController extends HttpServlet {
 		session.invalidate();
 		response.sendRedirect(request.getContextPath()+"/login.jsp");
 	}
-
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
