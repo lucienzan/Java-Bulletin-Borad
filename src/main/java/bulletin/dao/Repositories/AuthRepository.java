@@ -26,7 +26,6 @@ public class AuthRepository implements IAuthRepository {
                 .findFirst()
                 .orElse(null);
 
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -84,7 +83,6 @@ public class AuthRepository implements IAuthRepository {
 		User user = new User();
 		Role role = new Role();
 		
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -147,7 +145,6 @@ public class AuthRepository implements IAuthRepository {
 	public ResponseModel ChangePassword(User obj)
 	{
 		ResponseModel model = new ResponseModel();		
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -187,7 +184,6 @@ public class AuthRepository implements IAuthRepository {
 
 	public ResponseModel CheckEmail(String mail) {
 		ResponseModel model = new ResponseModel();		
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -220,7 +216,6 @@ public class AuthRepository implements IAuthRepository {
 
 	public ResponseModel ResetPassword(String mail,String passwrod) {
 		ResponseModel model = new ResponseModel();		
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		

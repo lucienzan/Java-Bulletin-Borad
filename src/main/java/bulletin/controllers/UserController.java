@@ -45,22 +45,22 @@ public class UserController extends HttpServlet {
 			if (contentType == null && url.endsWith("UserController")) {
 				request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
 			} else if (contentType != null && url.endsWith("UserController")) {
-				this.GetUserList(request, response);
+				this.getUserList(request, response);
 			} else if (url.endsWith("user-create")) {
-				this.GetUser(request, response);
+				this.getUser(request, response);
 			} else if(url.endsWith("user-detail")) {
-				this.GetUserDetail(request,response);
+				this.getUserDetail(request,response);
 			} else if(url.endsWith("user-edit")) {
-				this.EditUser(request,response);
+				this.editUser(request,response);
 			} else if(url.endsWith("profile")) {
-				this.Profile(request,response);
+				this.profile(request,response);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private void GetUserDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void getUserDetail(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String id = request.getParameter("id");
 		User user = _userService.Get(id);
 		Gson gson = new GsonBuilder().serializeNulls().create();
@@ -69,14 +69,14 @@ public class UserController extends HttpServlet {
 		response.getWriter().write(json);
 	}
 	
-	private void Profile(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	private void profile(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String id = request.getParameter("userId");
 		User user = _userService.Get(id);
 		request.setAttribute("userModel", user);
 		request.getRequestDispatcher("/Views/Account/profile.jsp").forward(request, response);
 	}
 
-	private void GetUserList(HttpServletRequest request, HttpServletResponse response)
+	private void getUserList(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("application/json");
 		List<User> userList = _userService.GetAll();
@@ -87,12 +87,12 @@ public class UserController extends HttpServlet {
 		response.getWriter().write(json);
 	}
 
-	private void GetUser(HttpServletRequest request, HttpServletResponse response)
+	private void getUser(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
 	}
 	
-	private void EditUser(HttpServletRequest request, HttpServletResponse response) {
+	private void editUser(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			String userId = request.getParameter("userId");
 			User model = _userService.Get(userId);
@@ -109,16 +109,16 @@ public class UserController extends HttpServlet {
 			throws ServletException, IOException {
 		String url = request.getServletPath().toString(); 
 		if(url.endsWith("updateUser")) {
-			this.UpdateUser(request, response);
+			this.updateUser(request, response);
 		}else {
-			this.CreateUser(request,response);
+			this.createUser(request,response);
 		}
 	}
 	
-	private void CreateUser(HttpServletRequest request, HttpServletResponse response) {
+	private void createUser(HttpServletRequest request, HttpServletResponse response) {
 		try {
             response.setContentType("text/html;charset=UTF-8");
-     		boolean errorExist = this.Validation(request, response);
+     		boolean errorExist = this.validation(request, response);
             String fileName = "user.png";
    		
      		HttpSession session = request.getSession(false);
@@ -128,7 +128,7 @@ public class UserController extends HttpServlet {
     			request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
     		} else {
     			 Part part = request.getPart("profile");
-                 fileName = ExtractFileName(part);
+                 fileName = extractFileName(part);
 
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
@@ -141,7 +141,7 @@ public class UserController extends HttpServlet {
 
     			UUID randomIdUuid = UUID.randomUUID();
 	            Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = ConvertStringToTimestamp(request.getParameter("dob"));
+    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
     			String id = randomIdUuid.toString();
 
     			ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
@@ -173,7 +173,7 @@ public class UserController extends HttpServlet {
 		}	
 	}
 	
-	private void UpdateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void updateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
             response.setContentType("text/html;charset=UTF-8");
             
@@ -181,7 +181,7 @@ public class UserController extends HttpServlet {
  			String id = request.getParameter("id");
  			String isProfileRoute = request.getParameter("isProfileRoute");
      		
-     		boolean errorExist = this.Validation(request, response);
+     		boolean errorExist = this.validation(request, response);
      		HttpSession session = request.getSession(false);
      		User user= (User) session.getAttribute("userManager");
 
@@ -192,7 +192,7 @@ public class UserController extends HttpServlet {
      		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     		} else {
    	    	 	Part part = request.getPart("profile");
-    			fileName = ExtractFileName(part);
+    			fileName = part.getSize() != 0 ? extractFileName(part) : fileName;
     			String email = request.getParameter("email");
     			String firstName = request.getParameter("firstName");
     			String lastName = request.getParameter("lastName");
@@ -200,13 +200,11 @@ public class UserController extends HttpServlet {
     			String address = request.getParameter("address");
     			String phone = request.getParameter("phone");
     			String oldProfile = request.getParameter("oldProfile");
-     			String profile = fileName;
-
 	            Timestamp updateDate = new Timestamp(System.currentTimeMillis());
-    			Timestamp dob = ConvertStringToTimestamp(request.getParameter("dob"));
+    			Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
 
     			ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address,
-    					profile, phone, roleId, dob, updateDate, user.getId(), oldProfile));
+    					fileName, phone, roleId, dob, updateDate, user.getId(), oldProfile));
     			ServletContext context = getServletContext();  
     			String dir = context.getInitParameter("fileDir");  
     			
@@ -226,7 +224,7 @@ public class UserController extends HttpServlet {
      	 			if(isProfileRoute == null)
      	 				request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
      	 			else
-         		    	request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
+     	 				request.getRequestDispatcher("/Views/Account/profile.jsp").include(request, response);	
     			}else {
     				request.setAttribute("model", model);
      	 			if(isProfileRoute == null)
@@ -240,7 +238,7 @@ public class UserController extends HttpServlet {
 		}	
 	}
 	
-	private String ExtractFileName(Part part) {
+	private String extractFileName(Part part) {
 	        String contentDisp = part.getHeader("content-disposition");
 	        String[] items = contentDisp.split(";");
 	        UUID uuid = UUID.randomUUID();
@@ -252,7 +250,7 @@ public class UserController extends HttpServlet {
 	        return "";
 	    }
 	
-	private static Timestamp ConvertStringToTimestamp(String inputDateStr) {
+	private static Timestamp convertStringToTimestamp(String inputDateStr) {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date parsedDate =  dateFormat.parse(inputDateStr);
@@ -264,7 +262,7 @@ public class UserController extends HttpServlet {
         }
     }
 
-	private boolean Validation(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+	private boolean validation(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
@@ -361,8 +359,8 @@ public class UserController extends HttpServlet {
 	         request.setAttribute("fileError", Message.FileSize);
 	        error = true;
 	    }else if(url.endsWith("user-create") && url.endsWith("updateUser")) {
-	    	 String fileName = ExtractFileName(part);
- 			 boolean isAllowExtension =  CheckExtension(fileName);
+	    	 String fileName = extractFileName(part);
+ 			 boolean isAllowExtension =  checkExtension(fileName);
  			 if(isAllowExtension == false) {
  				request.setAttribute("fileError", Message.FileTypeError);
  				error = true;
@@ -372,7 +370,7 @@ public class UserController extends HttpServlet {
 		return error;
 	}
 	
-	private boolean CheckExtension(String fileName) {
+	private boolean checkExtension(String fileName) {
 		String [] allowExtesnions = {"png","jpeg","jpg"};
 		String getExtension = null;
 		int lastDotIndex = fileName.lastIndexOf('.');

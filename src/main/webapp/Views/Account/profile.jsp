@@ -8,6 +8,18 @@
 <jsp:useBean id="userModel" class="bulletin.models.User"
 scope="request"></jsp:useBean>
 <jsp:setProperty property="*" name="userModel" />
+<c:choose>
+	<c:when test="${ model.getMessageType() == 2 }">
+		<div class="alert alert-danger col-12 mt-2" role="alert">
+			<c:out value="${ model.getMessageName() }"></c:out>
+		</div>
+	</c:when>
+	<c:when test="${ model.getMessageType() == 1 }">
+		<div class="alert alert-success col-12 mt-2" role="alert">
+			<c:out value="${ model.getMessageName() }"></c:out>
+		</div>
+	</c:when>
+</c:choose>
 <div class="mt-3">
 	<ul class="nav nav-tabs" id="myTab" role="tablist">
 		<li class="nav-item" role="presentation">
@@ -25,9 +37,11 @@ scope="request"></jsp:useBean>
 		<div class="tab-pane fade show active" id="home-tab-pane"
 			role="tabpanel" aria-labelledby="home-tab" tabindex="0">
 <div class="row mt-4">
-				<div class="col-7">
+				<div class="col-10">
 					<div class="row">
-						<div class="col-6">
+						<div class="col-8">
+							<div class="row">
+								<div class="col-6">
 							<span class="fw-bold">First Name</span>
 							<p class="firstName"></p>
 						</div>
@@ -55,24 +69,15 @@ scope="request"></jsp:useBean>
 							<span class="fw-bold">Date Of Birth</span>
 							<p class="dob"></p>
 						</div>
+							</div>
+						</div>
+						<img alt="profile" src="" class="rounded col-4 imgProfile" id="imgProfile">
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
 			aria-labelledby="profile-tab" tabindex="0">
-			<c:choose>
-				<c:when test="${ model.getMessageType() == 2 }">
-					<div class="alert alert-danger col-12 mt-2" role="alert">
-						<c:out value="${ model.getMessageName() }"></c:out>
-					</div>
-				</c:when>
-				<c:when test="${ model.getMessageType() == 1 }">
-					<div class="alert alert-success col-12 mt-2" role="alert">
-						<c:out value="${ model.getMessageName() }"></c:out>
-					</div>
-				</c:when>
-			</c:choose>
 			<form id="myForm"
 				action="<%= request.getContextPath()+"/updateUser" %>" method="POST"
 				enctype="multipart/form-data" class="g-3 mt-4">
@@ -140,14 +145,18 @@ scope="request"></jsp:useBean>
 						<label for="role" class="form-label">Role</label> <span
 							class="text-danger fw-bold">*</span> <select
 							class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}"
+							<%= userInfo.getRoleName().equals("Admin") ? "" : "disabled" %>
 							name="roleId">
 							<option selected disabled value="">Choose a role</option>
 							<c:forEach var="role" items="${roles.getRoleList()}">
 								<option value="${ role.getId() }"
-									${userModel.getRoleId() eq role.getId() ? 'selected' : ''}><c:out
+									${userModel.getRoleId() eq role.getId() || param.roleId eq role.getId() ? 'selected' : ''}><c:out
 										value="${role.getName()}"></c:out></option>
 							</c:forEach>
 						</select>
+						 <c:if test="${ userInfo.getRoleName() != 'Admin' }">
+                        	<input type="hidden" name="roleId" value="${ userModel.getRoleId() }">
+                        </c:if>
 						<c:if test="${requestScope.roleError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.roleError}" />

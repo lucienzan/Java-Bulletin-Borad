@@ -335,7 +335,8 @@ try{
 			LastName,
 			Phone,
 			DOB,
-			RoleName
+			RoleName,
+			Profile
 		} = JSON.parse(data);
 		$(".firstName").text(FirstName);
 		$(".lastName").text(LastName);
@@ -350,6 +351,7 @@ try{
 		$(".email").text(Email);
 		$(".phone").text(Phone == null ? "Unknown" : Phone);
 		$(".dob").text(DOB == null ? "Unknown" : formatDate(DOB));
+        $("#imgProfile").attr("src","/BulletinOJT/assets/img/profile/"+Profile);
 	});
 	}) 
 }

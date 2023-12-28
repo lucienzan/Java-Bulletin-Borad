@@ -1,4 +1,4 @@
-<title>Bulletin Board | User List</title>
+<title>Bulletin Board | Users</title>
 
 <%@ include file="/Layout/header.jsp" %>
 <% 

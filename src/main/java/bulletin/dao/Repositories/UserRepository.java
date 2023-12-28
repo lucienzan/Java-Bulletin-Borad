@@ -27,7 +27,6 @@ public class UserRepository implements IUserRepository {
 	private String sqlQuery = "";
 
 	public List<User> GetAll() {
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -84,7 +83,6 @@ public class UserRepository implements IUserRepository {
 	}
 
 	public User Get(String id) {
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -135,7 +133,6 @@ public class UserRepository implements IUserRepository {
 	public ResponseModel Create(User obj) {
 		ResponseModel model = new ResponseModel();
 
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -197,7 +194,6 @@ public class UserRepository implements IUserRepository {
 	public ResponseModel Update(User obj) {
 		ResponseModel model = new ResponseModel();
 
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -273,7 +269,6 @@ public class UserRepository implements IUserRepository {
 	
 	public ResponseModel Delete(String id,String currentUser) {
 		ResponseModel model = new ResponseModel();
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -317,7 +312,7 @@ public class UserRepository implements IUserRepository {
 	}
 	
 	private boolean DeleteFile(String fileName) throws IOException {
-		if(fileName != null && fileName != "user.png" && !fileName.isEmpty()) {
+		if(fileName != null && !fileName.equals("user.png") && !fileName.isEmpty()) {
 			String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
 			
         	File fileUploadDirectory = new File(filePath + "\\" + fileName);

@@ -51,19 +51,19 @@ public class PostController extends HttpServlet {
 		if (contentType == null && url.endsWith("PostController")) {
 			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		} else if (contentType != null && url.endsWith("PostController")) {
-			this.GetAll(request,response);
+			this.getAll(request,response);
 		} else if (url.endsWith("post-detail")) {
-			this.ShowPost(request,response);
+			this.showPost(request,response);
 		} else if (url.endsWith("post-create")) {
-			this.CreatePost(request,response);
+			this.createPost(request,response);
 		} else if (url.endsWith("post-edit")) {
-			this.GetPost(request,response);
+			this.getPost(request,response);
 		} else if (url.endsWith("excel-export")) {
-			this.ExcelExport(request,response);
+			this.excelExport(request,response);
 		}
 	}
 
-	private void GetAll(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void getAll(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		Role role = new Role();
 		var userRoleId = role.getRoleList().stream()
@@ -88,14 +88,14 @@ public class PostController extends HttpServlet {
 		response.getWriter().write(json);
 	}
 	
-	private void GetPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void getPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String id = request.getParameter("postId");
 		Post post = _postService.Get(id);
 		request.setAttribute("post", post);
 		request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
 	}
 
-	private void CreatePost(HttpServletRequest request, HttpServletResponse response)
+	private void createPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
 	}
@@ -104,17 +104,17 @@ public class PostController extends HttpServlet {
 		String url = request.getRequestURL().toString();
 
 		if(url.endsWith("excel-import")) {
-			this.ExcelImport(request,response);
+			this.excelImport(request,response);
 		}else if(url.endsWith("post-create")) {
-			this.InsertPost(request,response);
+			this.insertPost(request,response);
 		}else if(url.endsWith("post-edit")) {
-			this.UpdatePost(request, response);
+			this.updatePost(request, response);
 		}
 	}
 
-	private void InsertPost(HttpServletRequest request, HttpServletResponse response)
+	private void insertPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		boolean hasError = Validation(request);
+		boolean hasError = validation(request);
 		if(hasError) {
 			request.getRequestDispatcher("/Views/Post/create.jsp").include(request, response);
 		}else {
@@ -131,9 +131,9 @@ public class PostController extends HttpServlet {
 		}
 	}
 	
-	private void UpdatePost(HttpServletRequest request, HttpServletResponse response)
+	private void updatePost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		boolean hasError = Validation(request);
+		boolean hasError = validation(request);
 		if(hasError) {
 			request.getRequestDispatcher("/Views/Post/edit.jsp").include(request, response);
 		}else {
@@ -156,7 +156,7 @@ public class PostController extends HttpServlet {
 		}
 	}
 	
-	private void ShowPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void showPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String id = request.getParameter("id");
 		Post post = _postService.Get(id);
 		
@@ -165,12 +165,12 @@ public class PostController extends HttpServlet {
 		response.getWriter().write(obj);
 	}
 	
-	private void ExcelImport(HttpServletRequest request, HttpServletResponse response)
+	private void excelImport(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		Part part = request.getPart("importFile");
 
 		if (part != null && part.getSize() > 0) {
-			String fileName = ExtractFileName(part);
+			String fileName = extractFileName(part);
 			boolean isAllowExtension = hasExcelExtension(fileName);
 			if (isAllowExtension == false) {
 				request.setAttribute("fileError", Message.FileTypeError);
@@ -192,6 +192,8 @@ public class PostController extends HttpServlet {
 				while ((row = sheet.getRow(i)) != null) {
 					Cell titleCell = row.getCell(0);
 					Cell descriptionCell = row.getCell(1);
+					Cell statusCell = row.getCell(2);
+					boolean status = false;
 					
 				    if (titleCell == null) {
 				        model.setMessageType(Message.FAIL);
@@ -203,10 +205,14 @@ public class PostController extends HttpServlet {
 				        model.setMessageName(Message.RDescription);
 				        break;  
 				    }
+				    if(statusCell != null) {
+						status = row.getCell(2).getStringCellValue().equalsIgnoreCase("Published") ? true : false;
+					}
+				    
 				    post.setId(UUID.randomUUID().toString());
 				    post.setTitle(row.getCell(0).getStringCellValue());
 				    post.setDescription(row.getCell(1).getStringCellValue());
-				    post.setIsPublished(row.getCell(2).getStringCellValue().equalsIgnoreCase("Published"));
+				    post.setIsPublished(status);
 				    post.setCreatedDate(createdDate);
 				    post.setCreatedUserId(user.getId());
 				    model = _postService.Create(post);
@@ -223,7 +229,7 @@ public class PostController extends HttpServlet {
 		request.getRequestDispatcher("/Views/Post/post-list.jsp").include(request, response);
 	}
 
-	private void ExcelExport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
+	private void excelExport(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
 		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
         
@@ -275,7 +281,7 @@ public class PostController extends HttpServlet {
         }
 	}
 	
-	private String ExtractFileName(Part part) {
+	private String extractFileName(Part part) {
         String contentDisp = part.getHeader("content-disposition");
         String[] items = contentDisp.split(";");
         UUID uuid = UUID.randomUUID();
@@ -292,7 +298,7 @@ public class PostController extends HttpServlet {
 	    return extension.equals("xls") || extension.equals("xlsx");
 	}
 	
-	private boolean Validation(HttpServletRequest request) {
+	private boolean validation(HttpServletRequest request) {
 		boolean hasError = false;
 		String title = request.getParameter("title");
 		String description = request.getParameter("description");

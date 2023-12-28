@@ -11,10 +11,9 @@ public class DbConnection {
 	private static final String DB_URL = "jdbc:mysql://localhost:3306/bulletinboard";
 	private static final String DB_USER = "root";
 	private static final String DB_PASS = "root";
-	private static Connection con = null;
-	private static DbConnection instance = null;
 	
-	private DbConnection() {
+	public static Connection GetDbConnection() {
+		Connection con = null;
 		try {
 			Class.forName(DRIVER_NAME);
 		    con = DriverManager.getConnection(DB_URL,DB_USER,DB_PASS);
@@ -23,16 +22,6 @@ public class DbConnection {
 		}catch (SQLException eq) {
 			eq.printStackTrace();
 		}
-	}
-	
-	public static DbConnection GetInstance()
-	{
-		instance = new DbConnection();
-		
-		return instance;
-	}
-	
-	public static Connection GetDbConnection() {
 		return con;
 	}
 	

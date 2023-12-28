@@ -1,3 +1,4 @@
+<title>Bulletin Board | User Create</title>
 <%@ include file="/Layout/header.jsp" %>
 <% 
 if(userInfo.getRoleName() != null){

@@ -16,7 +16,6 @@ public class PostRepository implements IPostRepository{
 	private String sqlQuery = "";
 
 	public List<Post> GetAll(){
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -36,7 +35,6 @@ public class PostRepository implements IPostRepository{
 				post.setCreatedUserId(resultSet.getString("CreatedUserId"));
 				postList.add(post);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -46,7 +44,6 @@ public class PostRepository implements IPostRepository{
 	}
 
 	public Post Get(String id){
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -77,7 +74,6 @@ public class PostRepository implements IPostRepository{
 	}
 	
 	public ResponseModel Create(Post obj) {
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -120,7 +116,6 @@ public class PostRepository implements IPostRepository{
 	}
 	
 	public ResponseModel Update(Post obj) {
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -167,7 +162,6 @@ public class PostRepository implements IPostRepository{
 
 	public ResponseModel Delete(String id,String currentUser) {
 		ResponseModel model = new ResponseModel();
-		DbConnection.GetInstance();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
 		

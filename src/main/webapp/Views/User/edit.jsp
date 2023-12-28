@@ -1,3 +1,4 @@
+<title>Bulletin Board | User Edit</title>
 <%@ include file="/Layout/header.jsp" %>
 <% 
 if(userInfo.getRoleName() != null){
@@ -79,13 +80,13 @@ if(userInfo.getRoleName() != null){
                     <div class="col-12 col-md-6 mb-3">
                         <label for="role" class="form-label">Role</label>
                         <span class="text-danger fw-bold">*</span>
-                        <select ${ userinfo.getRoleName() != "admin" ? "disabled" : "" } class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}" name="roleId">
+                        <select <%= userInfo.getRoleName().equals("Admin") ? "" : "disabled" %> class="form-select ${not empty requestScope.roleError ? 'is-invalid' : ''}" name="roleId">
                             <option selected disabled value="">Choose a role</option>
                         	<c:forEach var="role" items="${roles.getRoleList()}">
                         	  <option value="${ role.getId() }"  ${userModel.getRoleId() eq role.getId() || param.roleId eq role.getId() ? 'selected' : ''}><c:out value="${role.getName()}"></c:out></option>
                         	</c:forEach>
                         </select>
-                        <c:if test="${ userinfo.getRoleName() != 'admin' }">
+                        <c:if test="${ userInfo.getRoleName() != 'Admin' }">
                         	<input type="hidden" name="roleId" value="${ userModel.getRoleId() }">
                         </c:if>
                         <c:if test="${requestScope.roleError != null}">

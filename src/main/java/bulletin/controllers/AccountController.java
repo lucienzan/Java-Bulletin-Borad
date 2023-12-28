@@ -45,22 +45,22 @@ public class AccountController extends HttpServlet {
 			throws ServletException, IOException {
 		String action = request.getParameter("action");
 		if (action.contentEquals("login")) {
-			Login(request, response);
+			login(request, response);
 		} else if (action.contentEquals("register")) {
-			Register(request, response);
+			register(request, response);
 		} else if (action.contentEquals("changePwd")) {
-			ChangePassword(request, response);
+			changePassword(request, response);
 		} else if (action.contentEquals("forgotPwd")) {
-			ForgotPassword(request, response);
+			forgotPassword(request, response);
 		} else if (action.contentEquals("resetPwd")) {
-			ResetPassword(request, response);
+			resetPassword(request, response);
 		}
 	}
 
-	private void Login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		User user = new User();
-		boolean errorExist = this.Validation(request, response);
+		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("login.jsp").include(request, response);
 		} else {
@@ -80,12 +80,12 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private void Register(HttpServletRequest request, HttpServletResponse response)
+	private void register(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		User user = new User();
 
-		boolean errorExist = this.Validation(request, response);
+		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("/register.jsp").include(request, response);
 		} else {
@@ -111,9 +111,9 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private void ChangePassword(HttpServletRequest request, HttpServletResponse response)
+	private void changePassword(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		boolean errorExist = this.Validation(request, response);
+		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("/Views/Account/change-password.jsp").include(request, response);
 		} else {
@@ -131,9 +131,9 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private void ForgotPassword(HttpServletRequest request, HttpServletResponse response)
+	private void forgotPassword(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		boolean errorExist = this.Validation(request, response);
+		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("/Views/Account/forgot-password.jsp").include(request, response);
 		} else {
@@ -165,7 +165,7 @@ public class AccountController extends HttpServlet {
 					ServletContext context = getServletContext();
 					String dir = context.getInitParameter("templateDir");
 					String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
-					String fileContent = ReadFile(dir);
+					String fileContent = readFile(dir);
 					String mailBody = fileContent.replace("#name#", name)
 							.replace("#route_link#", baseUrl + "/Views/Account/reset-password.jsp")
 							.replace("#home_route#", baseUrl + "/login.jsp");
@@ -192,8 +192,8 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private void ResetPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		boolean errorExist = this.Validation(request, response);
+	private void resetPassword(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
 			request.getRequestDispatcher("/Views/Account/reset-password.jsp").include(request, response);
 		} else {
@@ -209,7 +209,7 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
-	private String ReadFile(String filePath) {
+	private String readFile(String filePath) {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
 			String line;
@@ -222,7 +222,7 @@ public class AccountController extends HttpServlet {
 		return sb.toString();
 	}
 
-	private boolean Validation(HttpServletRequest request, HttpServletResponse response) {
+	private boolean validation(HttpServletRequest request, HttpServletResponse response) {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
