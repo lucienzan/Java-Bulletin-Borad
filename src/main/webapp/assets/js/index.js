@@ -170,6 +170,7 @@ $("#postList").DataTable({
 				return str;
 			}
 		},
+		{ "data": "Author", "name": "Author", "width": "20%" },
 		{
 			"render": function(data, type, full, meta)  {
 				var date = formatDate(full.CreatedDate);
@@ -212,13 +213,13 @@ $("table tbody").on("click", "#viewPostBtn", function () {
             Title,
             Description,
             IsPublished,
-            CreatedUserId,
+            Author,
             CreatedDate,
         } = JSON.parse(data);
         $("#modalTtl").text(Title);
         $(".ttl").text(Title);
         $(".describe").text(Description);
-        $(".author").text(CreatedUserId);
+        $(".author").text(Author);
         if (IsPublished == false) {
             $(".status").html("<span class='badge rounded-pill bg-danger'>Unpublished</span>")
         } else {

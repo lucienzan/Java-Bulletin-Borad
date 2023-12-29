@@ -311,13 +311,14 @@ public class UserController extends HttpServlet {
 		}
 
 		// birthday check
-		if (!dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
+		if (!dob.isEmpty() && !dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			System.out.println("hi");
 			request.setAttribute("dobError", Message.FDOB);
 			error = true;
 		}
 
 		// address check
-		if (!lastName.contentEquals("") && address.length() > 100) {
+		if (!address.contentEquals("") && address.length() > 100) {
 			request.setAttribute("addressError", Message.LAddress);
 			error = true;
 		}

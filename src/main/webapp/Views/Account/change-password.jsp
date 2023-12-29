@@ -1,3 +1,4 @@
+<title>Bulletin Board | Change Password</title>
 <%@ include file="/Layout/header.jsp" %>
 	<c:choose>
 		<c:when test="${ model.getMessageType() == 2 }">
@@ -12,8 +13,7 @@
 		</c:when>
 	</c:choose>
             <h3 class="my-4">Change Password</h3>
-            <form action="<%= request.getContextPath() + "/AccountController" %>" method="POST" class="g-3 ">
-            	<input type="hidden" name="action" value="changePwd">
+            <form action="<%= request.getContextPath() + "/AccountController/change-password" %>" method="POST" class="g-3 ">
                 <div class="row align-items-center flex-column">
                     <div class="col-6 mb-3">
                         <label for="opassword" class="form-label">Old Password</label>

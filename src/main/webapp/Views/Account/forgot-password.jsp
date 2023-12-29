@@ -41,8 +41,7 @@
 				<div class="col-10 col-lg-4 m-auto">
 					<h3 class="text-center">Forgot Password</h3>
 					<p class="text-secondary text-center">No worries, we'll send you reset instructions.</p>
-					<form action="<%= request.getContextPath() + "/AccountController" %>" method="post">
-						<input type="hidden" name="action" value="forgotPwd">
+					<form action="<%= request.getContextPath() + "/AccountController/forgot-password" %>" method="post">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
 							<input required class="form-control ${not empty requestScope.emailError ? 'is-invalid' : ''}" type="email" value="<%= user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
@@ -54,7 +53,7 @@
 						</div>
 						<button type="submit" class="btn btn-dark w-100 p-2">Send</button>
 						<div class="text-center mt-4">
-							<a href="/BulletinOJT/login.jsp" class="cc-tag text-decoration-none text-dark">Back to login?</a>
+							<a href="<%= request.getContextPath() + "/login.jsp" %>" class="cc-tag text-decoration-none text-dark">Back to login?</a>
 						</div>
 					</form>
 				</div>

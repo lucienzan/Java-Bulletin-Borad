@@ -39,30 +39,36 @@ public class AccountController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		HttpSession session = request.getSession(true);
+		if(session.getAttribute("userManager") == null) {
+			response.sendRedirect(request.getContextPath() + "/login.jsp");
+		} else {
+			response.sendRedirect(request.getContextPath() +"/Layout/index.jsp");
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String action = request.getParameter("action");
-		if (action.contentEquals("login")) {
+		String url = request.getRequestURL().toString();
+		
+		if (url.endsWith("login")) {
 			login(request, response);
-		} else if (action.contentEquals("register")) {
+		} else if (url.endsWith("register")) {
 			register(request, response);
-		} else if (action.contentEquals("changePwd")) {
+		} else if (url.endsWith("change-password")) {
 			changePassword(request, response);
-		} else if (action.contentEquals("forgotPwd")) {
+		} else if (url.endsWith("forgot-password")) {
 			forgotPassword(request, response);
-		} else if (action.contentEquals("resetPwd")) {
+		} else if (url.endsWith("reset-password")) {
 			resetPassword(request, response);
 		}
 	}
 
 	private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
 		User user = new User();
 		boolean errorExist = this.validation(request, response);
 		if (errorExist) {
-			request.getRequestDispatcher("login.jsp").include(request, response);
+			request.getRequestDispatcher("/login.jsp").include(request, response);
 		} else {
 			user.setEmail(request.getParameter("email"));
 			user.setPassword(request.getParameter("password"));
@@ -75,7 +81,7 @@ public class AccountController extends HttpServlet {
 				response.sendRedirect(request.getContextPath() + "/Layout/index.jsp");
 			} else {
 				request.setAttribute("model", model);
-				request.getRequestDispatcher("login.jsp").include(request, response);
+				request.getRequestDispatcher("/login.jsp").include(request, response);
 			}
 		}
 	}
@@ -180,6 +186,7 @@ public class AccountController extends HttpServlet {
 
 					HttpSession resetSession = request.getSession(true);
 					resetSession.setAttribute("resetManager", email);
+					resetSession.setMaxInactiveInterval(15 * 60);
 					request.setAttribute("model", model);
 					request.getRequestDispatcher("/Views/Account/forgot-password.jsp").forward(request, response);
 				} catch (MessagingException e) {
@@ -202,7 +209,7 @@ public class AccountController extends HttpServlet {
 			session.removeAttribute("resetManager");
 			session.invalidate();
 			request.setAttribute("model", model);
-			request.getRequestDispatcher("login.jsp").forward(request, response);
+			request.getRequestDispatcher("/login.jsp").forward(request, response);
 		}
 	}
 
@@ -225,9 +232,9 @@ public class AccountController extends HttpServlet {
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 		String password = request.getParameter("password");
 		String email = request.getParameter("email");
-
-		if (!request.getParameter("action").contentEquals("changePwd")
-				&& !request.getParameter("action").contentEquals("resetPwd")) {
+		String url = request.getRequestURL().toString();
+		if (!url.endsWith("change-password")
+				&& !url.endsWith("reset-password")) {
 			// email check
 			if (email == null) {
 				request.setAttribute("emailError", Message.REmail);
@@ -238,7 +245,7 @@ public class AccountController extends HttpServlet {
 			}
 		}
 
-		if (!request.getParameter("action").contentEquals("forgotPwd")) {
+		if (!url.endsWith("forgot-password")) {
 			if (password.isEmpty()) {
 				request.setAttribute("passwordError", Message.RPassword);
 				error = true;
@@ -248,23 +255,24 @@ public class AccountController extends HttpServlet {
 			}
 		}
 
-		if (request.getParameter("action").contentEquals("register")
-				|| request.getParameter("action").contentEquals("changePwd")
-				|| request.getParameter("action").contentEquals("resetPwd")) {
+		if (url.endsWith("register")
+				|| url.endsWith("change-password")
+				|| url.endsWith("reset-password")) {
 			String cPassword = request.getParameter("cpassword");
 
 			// password check
 			if (cPassword.isEmpty()) {
 				request.setAttribute("cpasswordError", Message.RCPassword);
 				error = true;
-			} else if (!password.contentEquals(cPassword)) {
+			} else if (!password.endsWith(cPassword)) {
 				request.setAttribute("cpasswordError", Message.PasswordMatch);
 				error = true;
 			}
 		}
 
-		if (request.getParameter("action").contentEquals("changePwd")) {
+		if (url.endsWith("change-password")) {
 			String oPassword = request.getParameter("opassword");
+			
 			// old password check
 			if (oPassword.isEmpty()) {
 				request.setAttribute("opasswordError", Message.ROPassword);

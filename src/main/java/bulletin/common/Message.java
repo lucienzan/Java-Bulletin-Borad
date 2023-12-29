@@ -14,15 +14,14 @@ public class Message {
     public static String DeleteSuccess = "Successfully deleted.";
     public static String SendSuccess = "Reset password link is successfully sent into your mail box.";
     
+    // Validation Messages    
     // Error Messages
     public static String AccountExist = "Email has already used.";
     public static String AccountFail = "Failed to create.";
-    public static String IsAccountMatch = "Email or password is incorrect.";
+    public static String IsAccountMatch = "Sorry, your email or password is incorrect. Please try again.";
     public static String AccountNotFound = "Account does not exist.";
     public static String NotActive = "Account has not activated yet.";
-    public static String LoginFail = "Login Failed.";
 
-    // Validation Messages
     // Account
     public static String REmail = "Email field is required.";
     public static String RFirstname = "FirstName field is required.";
@@ -52,6 +51,7 @@ public class Message {
     public static String LDescription = "Description words length must be less than 1000.";
     public static String RFile = "File input field is required.";
     public static String TitleExist = "Title is already used.";
+    public static String ExportFail = "There is no data available to export currently.";
 
     // SQL Error
     public static String SError = "Either server or sql is failed.";

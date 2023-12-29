@@ -210,8 +210,8 @@ public class PostController extends HttpServlet {
 					}
 
 					post.setId(UUID.randomUUID().toString());
-					post.setTitle(row.getCell(0).getStringCellValue());
-					post.setDescription(row.getCell(1).getStringCellValue());
+					post.setTitle(row.getCell(0).getStringCellValue().toString());
+					post.setDescription(row.getCell(1).getStringCellValue().toString());
 					post.setIsPublished(status);
 					post.setCreatedDate(createdDate);
 					post.setCreatedUserId(user.getId());
@@ -231,10 +231,8 @@ public class PostController extends HttpServlet {
 
 	private void excelExport(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-		response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
-
 		Role role = new Role();
+		ResponseModel model = new ResponseModel();
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute("userManager");
 		var userRoleId = role.getRoleList().stream().filter(r -> "User".equals(r.getName())).map(Role::getId)
@@ -245,35 +243,44 @@ public class PostController extends HttpServlet {
 			posts = posts.stream().filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
 					.collect(Collectors.toList());
 		}
+		
+		if(posts.size() > 0) {
+			try (OutputStream out = response.getOutputStream(); XSSFWorkbook workbook = new XSSFWorkbook()) {
+				XSSFSheet sheet = workbook.createSheet("Sheet1");
+				XSSFRow headerRow = sheet.createRow(0);
 
-		try (OutputStream out = response.getOutputStream(); XSSFWorkbook workbook = new XSSFWorkbook()) {
-			XSSFSheet sheet = workbook.createSheet("Sheet1");
-			XSSFRow headerRow = sheet.createRow(0);
+				// Set header values
+				headerRow.createCell(0).setCellValue("Title");
+				headerRow.createCell(1).setCellValue("Description");
+				headerRow.createCell(2).setCellValue("Status");
 
-			// Set header values
-			headerRow.createCell(0).setCellValue("Title");
-			headerRow.createCell(1).setCellValue("Description");
-			headerRow.createCell(2).setCellValue("Status");
+				// Populate the sheet with data
+				int rowNum = 1;
+				for (Post post : posts) {
+					Row row = sheet.createRow(rowNum++);
+					int colNum = 0;
 
-			// Populate the sheet with data
-			int rowNum = 1;
-			for (Post post : posts) {
-				Row row = sheet.createRow(rowNum++);
-				int colNum = 0;
+					Cell cellTitle = row.createCell(colNum++);
+					cellTitle.setCellValue(post.getTitle());
 
-				Cell cellTitle = row.createCell(colNum++);
-				cellTitle.setCellValue(post.getTitle());
+					Cell cellDescription = row.createCell(colNum++);
+					cellDescription.setCellValue(post.getDescription());
 
-				Cell cellDescription = row.createCell(colNum++);
-				cellDescription.setCellValue(post.getDescription());
-
-				Cell cellStatus = row.createCell(colNum++);
-				cellStatus.setCellValue(post.isIsPublished() ? "Published" : "Unpublished");
+					Cell cellStatus = row.createCell(colNum++);
+					cellStatus.setCellValue(post.isIsPublished() ? "Published" : "Unpublished");
+				}
+				
+				response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+				response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
+				workbook.write(out);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
-			workbook.write(out);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			model.setMessageType(Message.FAIL);
+			model.setMessageName(Message.ExportFail);
+			request.setAttribute("model", model);
+			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		}
 	}
 

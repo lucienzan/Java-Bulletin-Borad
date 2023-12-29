@@ -39,6 +39,7 @@
 					<th>Title</th>
                     <th>Description</th>
                     <th>IsPublished</th>
+                    <th>Author</th>
                     <th>Created At</th>
                     <th class="text-center">Actions</th>
 				</tr>
@@ -91,14 +92,12 @@
                         </div>
                         <div class="mt-2">
                         <span class="fw-bold d-block">Author</span>
-                            <p class="text-primary author"></p>
+                            <p class="author"></p>
                         </div>
-                        <div>
                         <div>
                             <span class="fw-bold ">Created Date</span>
                             <p class="date"></p>
                         </div>
-            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>

@@ -19,7 +19,6 @@ public class AuthRepository implements IAuthRepository {
 	public ResponseModel Register(User obj) {
 		ResponseModel model = new ResponseModel();
 		Role role =  new Role();
-
 		var userRoleId = role.getRoleList().stream()
                 .filter(r -> "User".equals(r.getName()))
                 .map(Role::getId)
@@ -34,7 +33,6 @@ public class AuthRepository implements IAuthRepository {
 			sqlQuery = "SELECT COUNT(*) FROM user WHERE Email = ?";
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
-
 			resultSet = preparedStatement.executeQuery();
 			resultSet.next();
 
@@ -59,7 +57,6 @@ public class AuthRepository implements IAuthRepository {
 				preparedStatement.setString(7, obj.getCreatedUserId());
 				preparedStatement.setTimestamp(8, obj.getCreatedDate());
 				preparedStatement.setBoolean(9, false);
-
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
@@ -92,13 +89,13 @@ public class AuthRepository implements IAuthRepository {
 			
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
-
 			resultSet = preparedStatement.executeQuery();
 
 			while (resultSet.next()) {
+				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				user.setId(resultSet.getString("Id"));
 				user.setEmail(resultSet.getString("Email"));
-				user.setFirstName(resultSet.getString("FirstName"));
+				user.setFullName(resultSet.getString("FirstName") + " " + lastName);
 				user.setDeletedFlag(resultSet.getBoolean("DeleteFlag"));
 				user.setActive(resultSet.getBoolean("Active"));
 				user.setRoleId(resultSet.getString("RoleId"));
@@ -133,7 +130,7 @@ public class AuthRepository implements IAuthRepository {
 				}
 			
 		}catch (Exception e) {
-			model.setMessageName(Message.LoginFail);
+			model.setMessageName(Message.SError);
 			model.setMessageType(Message.FAIL);
 			e.printStackTrace();
 		}

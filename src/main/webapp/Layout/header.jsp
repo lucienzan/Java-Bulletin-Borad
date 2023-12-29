@@ -27,7 +27,7 @@
 	}else{
 		userManager = (User) session.getAttribute("userManager");
 	    userInfo.setId(userManager.getId());
-	    userInfo.setFirstName(userManager.getFirstName());
+	    userInfo.setFullName(userManager.getFullName());
 	    userInfo.setRoleName(userManager.getRoleName());
 	}
 	response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HTTP 1.1
@@ -52,7 +52,7 @@
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <%= userInfo.getFirstName() %>
+          <%= userInfo.getFullName() %>
           </a>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" id="profileRoute" href="<%= request.getContextPath() + "/profile?userId=" + userInfo.getId() %>">Profile</a></li>

@@ -32,8 +32,7 @@
 			<div class="row align-items-center justify-content-between ">
 				<div class="col-10 col-lg-4 m-auto">
 					<h3 class="text-center">Sign Up</h3>
-					<form action="AccountController" method="post">
-						<input type="hidden" name="action" value="register">
+					<form action="<%= request.getContextPath() + "/AccountController/register"%>" method="post">
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
 							<input class="form-control ${not empty requestScope.emailError || model.getMessageName() != null  ? 'is-invalid' : ''}" type="email" value="<%=user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">

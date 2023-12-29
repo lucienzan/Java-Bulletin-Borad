@@ -8,6 +8,7 @@ public class Post {
 	private String Description;
 	private boolean IsPublished;
 	private boolean DeletedFlag;
+	private String Author;
 	private Timestamp CreatedDate;
 	private String CreatedUserId;
 	private Timestamp UpdatedDate;
@@ -56,6 +57,14 @@ public class Post {
 	
 	public void setIsPublished(boolean isPublished) {
 		IsPublished = isPublished;
+	}
+	
+	public String getAuthor() {
+		return Author;
+	}
+	
+	public void setAuthor(String author) {
+		Author = author;
 	}
 	
 	public boolean isDeletedFlag() {

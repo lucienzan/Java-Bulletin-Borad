@@ -51,7 +51,7 @@ if(userInfo.getRoleName() != null){
                     <div class="col-12 col-md-6 mb-3">
                         <label for="phone" class="form-label">Phone</label>
                         <span class="text-danger fw-bold">*</span>
-                        <input type="number" name="phone" value="${ userModel.getPhone() }" class="form-control rounded ${not empty requestScope.phoneError ? 'is-invalid' : ''}" placeholder="09123456789" id="phone">
+                        <input required type="number" name="phone" value="${ userModel.getPhone() }" class="form-control rounded ${not empty requestScope.phoneError ? 'is-invalid' : ''}" placeholder="09123456789" id="phone">
                     	<c:if test="${requestScope.phoneError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.phoneError}" />

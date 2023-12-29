@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sign in</title>
+<title>Reset Password</title>
 <link rel="stylesheet" href="/BulletinOJT/assets/css/style.css">
 <link
 		href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -41,8 +41,7 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HT
 				<div class="col-10 col-lg-4 m-auto">
 					<h3 class="text-center">Create New Password</h3>
 					<p class="text-center text-secondary">Set your new password, so you can login and access Bulletin Board.</p>
-					<form action="<%= request.getContextPath() + "/AccountController" %>" method="post">
-						<input type="hidden" name="action" value="resetPwd">
+					<form action="<%= request.getContextPath() + "/AccountController/reset-password" %>" method="post">
 						<div class="form-group mb-3">
 							<div class="d-flex justify-content-between">
 							<label class="form-label" for="password">Create New Password</label> 
@@ -66,6 +65,9 @@ response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); //HT
 							</c:if>	
 						</div>
 						<button type="submit" class="btn btn-dark w-100 p-2">Reset Password</button>
+						<div class="text-center mt-4">
+							<a href="<%= request.getContextPath() + "/login.jsp" %>" class="cc-tag text-decoration-none text-dark">Back to login?</a>
+						</div>
 					</form>
 				</div>
 				<div class="d-none d-lg-block col-lg-6 p-0">

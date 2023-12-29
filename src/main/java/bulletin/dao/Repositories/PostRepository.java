@@ -22,15 +22,17 @@ public class PostRepository implements IPostRepository{
 		List<Post> postList = new ArrayList<Post>();
 		
 		try {
-			sqlQuery = "SELECT * FROM post WHERE post.DeletedFlag = false";
+			sqlQuery = "SELECT * FROM post INNER JOIN user ON post.CreatedUserId = user.Id WHERE post.DeletedFlag = false";
 			statement = con.prepareStatement(sqlQuery);
 			resultSet = statement.executeQuery();
 			while (resultSet.next()) {
 				Post post = new Post();
+				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				post.setId(resultSet.getString("Id"));
 				post.setTitle(resultSet.getString("Title"));
 				post.setDescription(resultSet.getString("Description"));
 				post.setIsPublished(resultSet.getBoolean("IsPublished"));
+				post.setAuthor(resultSet.getString("FirstName")+" "+lastName);
 				post.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
 				post.setCreatedUserId(resultSet.getString("CreatedUserId"));
 				postList.add(post);
@@ -62,7 +64,7 @@ public class PostRepository implements IPostRepository{
 				post.setDescription(resultSet.getString("Description"));
 				post.setIsPublished(resultSet.getBoolean("IsPublished"));
 				post.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
-				post.setCreatedUserId(resultSet.getString("FirstName") + " " + lastName);
+				post.setAuthor(resultSet.getString("FirstName") + " " + lastName);
 			}
 
 		} catch (Exception e) {
