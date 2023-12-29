@@ -75,6 +75,8 @@ public class AccountController extends HttpServlet {
 
 			ResponseModel model = _accountService.Login(user);
 			if (model.getMessageType() == Message.SUCCESS) {
+				
+				// set the session with its expiration time in 30 minutes
 				HttpSession session = request.getSession(true);
 				session.setAttribute("userManager", model.getUserModel());
 				session.setMaxInactiveInterval(30 * 60);
@@ -149,6 +151,8 @@ public class AccountController extends HttpServlet {
 			} else {
 				String to = email;
 				String from = "bulletinBoradTeam@gmail.com";
+				
+				// your mail trap username and password
 				final String username = "b175e99d9a1a8e";
 				final String password = "f40868ff58681c";
 				String host = "smtp.mailtrap.io";
@@ -167,6 +171,8 @@ public class AccountController extends HttpServlet {
 					String name = email.substring(0, index);
 					ServletContext context = getServletContext();
 					String dir = context.getInitParameter("templateDir");
+					
+					// to get base url
 					String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
 					String fileContent = readFile(dir);
 					String mailBody = fileContent.replace("#name#", name)
@@ -184,6 +190,7 @@ public class AccountController extends HttpServlet {
 					message.setContent(multipart);
 					Transport.send(message);
 
+					// set the session with its expiration time in 15 minutes.
 					HttpSession resetSession = request.getSession(true);
 					resetSession.setAttribute("resetManager", email);
 					resetSession.setMaxInactiveInterval(15 * 60);
@@ -206,6 +213,7 @@ public class AccountController extends HttpServlet {
 			String password = request.getParameter("password");
 			ResponseModel model = _accountService.ResetPassword(mail,password);
 			
+			// remove session
 			session.removeAttribute("resetManager");
 			session.invalidate();
 			request.setAttribute("model", model);
@@ -213,6 +221,7 @@ public class AccountController extends HttpServlet {
 		}
 	}
 
+	// html file read for email template
 	private String readFile(String filePath) {
 		StringBuilder sb = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -226,6 +235,7 @@ public class AccountController extends HttpServlet {
 		return sb.toString();
 	}
 
+	// input validation
 	private boolean validation(HttpServletRequest request, HttpServletResponse response) {
 		boolean error = false;
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";

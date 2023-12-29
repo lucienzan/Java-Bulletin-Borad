@@ -128,7 +128,7 @@ public class UserController extends HttpServlet {
 				request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
 			} else {
 				Part part = request.getPart("profile");
-				fileName = extractFileName(part);
+				fileName = "img_"+UUID.randomUUID().toString()+part.getSubmittedFileName();
 
 				String id = UUID.randomUUID().toString();
 				String email = request.getParameter("email");
@@ -140,7 +140,7 @@ public class UserController extends HttpServlet {
 				String password = request.getParameter("password");
 				String profile = fileName;
 				Timestamp createdDate = new Timestamp(System.currentTimeMillis());
-				Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+				Timestamp dob =  request.getParameter("dob").isEmpty() ? null : convertStringToTimestamp(request.getParameter("dob"));
 
 				ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
 						profile, phone, roleId, dob, createdDate, user.getId()));
@@ -181,7 +181,7 @@ public class UserController extends HttpServlet {
 					request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
 			} else {
 				Part part = request.getPart("profile");
-				fileName = part.getSize() != 0 ? extractFileName(part) : fileName;
+				fileName = part.getSize() != 0 ? "img_"+UUID.randomUUID().toString()+part.getSubmittedFileName() : fileName;
 				String id = request.getParameter("id");
 				String email = request.getParameter("email");
 				String firstName = request.getParameter("firstName");
@@ -191,7 +191,7 @@ public class UserController extends HttpServlet {
 				String phone = request.getParameter("phone");
 				String oldProfile = request.getParameter("oldProfile");
 				Timestamp updateDate = new Timestamp(System.currentTimeMillis());
-				Timestamp dob = convertStringToTimestamp(request.getParameter("dob"));
+				Timestamp dob = request.getParameter("dob").isEmpty() ? null : convertStringToTimestamp(request.getParameter("dob"));
 
 				ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address, fileName,
 						phone, roleId, dob, updateDate, user.getId(), oldProfile));
@@ -331,7 +331,7 @@ public class UserController extends HttpServlet {
 			request.setAttribute("fileError", Message.FileSize);
 			error = true;
 		} else if (part.getSize() != 0 && part.getSize() < 1024 * 1024 * 10) {
-			String fileName = extractFileName(part);
+			String fileName = part.getSubmittedFileName();
 			boolean isAllowExtension = checkExtension(fileName);
 			if (isAllowExtension == false) {
 				request.setAttribute("fileError", Message.FileTypeError);
@@ -340,18 +340,6 @@ public class UserController extends HttpServlet {
 		}
 
 		return error;
-	}
-
-	private String extractFileName(Part part) {
-		String contentDisp = part.getHeader("content-disposition");
-		String[] items = contentDisp.split(";");
-		UUID uuid = UUID.randomUUID();
-		for (String s : items) {
-			if (s.trim().startsWith("filename")) {
-				return "img_" + uuid + s.substring(s.indexOf("=") + 2, s.length() - 1);
-			}
-		}
-		return "";
 	}
 	
 	private boolean checkExtension(String fileName) {

@@ -67,11 +67,14 @@ public class PostController extends HttpServlet {
 	private void getAll(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("application/json");
 		Role role = new Role();
+		
+		// Get user role id
 		var userRoleId = role.getRoleList().stream().filter(r -> "User".equals(r.getName())).map(Role::getId)
 				.findFirst().orElse(null);
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute("userManager");
 
+		// The current user's posts are shown if the current user role is user.
 		List<Post> postList = _postService.GetAll();
 		if (user.getRoleId().contentEquals(userRoleId)) {
 			postList = postList.stream().filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
@@ -170,8 +173,9 @@ public class PostController extends HttpServlet {
 		Part part = request.getPart("importFile");
 
 		if (part != null && part.getSize() > 0) {
-			String fileName = extractFileName(part);
+			String fileName = "file_"+UUID.randomUUID().toString()+part.getSubmittedFileName();
 			boolean isAllowExtension = hasExcelExtension(fileName);
+			
 			if (isAllowExtension == false) {
 				request.setAttribute("fileError", Message.FileTypeError);
 			} else if (part.getSize() > 1024 * 1024 * 2) {
@@ -235,9 +239,12 @@ public class PostController extends HttpServlet {
 		ResponseModel model = new ResponseModel();
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute("userManager");
+		
+		// Get user roleId
 		var userRoleId = role.getRoleList().stream().filter(r -> "User".equals(r.getName())).map(Role::getId)
 				.findFirst().orElse(null);
-
+		
+		// The current user's posts are shown if the current user role is user.
 		List<Post> posts = _postService.GetAll();
 		if (user.getRoleId().contentEquals(userRoleId)) {
 			posts = posts.stream().filter(post -> post.getCreatedUserId().contentEquals(user.getId()))
@@ -282,18 +289,6 @@ public class PostController extends HttpServlet {
 			request.setAttribute("model", model);
 			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		}
-	}
-
-	private String extractFileName(Part part) {
-		String contentDisp = part.getHeader("content-disposition");
-		String[] items = contentDisp.split(";");
-		UUID uuid = UUID.randomUUID();
-		for (String s : items) {
-			if (s.trim().startsWith("filename")) {
-				return "img_" + uuid + s.substring(s.indexOf("=") + 2, s.length() - 1);
-			}
-		}
-		return "";
 	}
 
 	private boolean hasExcelExtension(String fileName) {
