@@ -145,15 +145,16 @@ public class UserController extends HttpServlet {
 				ResponseModel model = _userService.Create(new User(id, firstName, lastName, email, password, address,
 						profile, phone, roleId, dob, createdDate, user.getId()));
 				ServletContext context = getServletContext();
-				String dir = context.getInitParameter("fileDir");
+		        String virtualPath = "/assets/img/profile";
+		        String realPath = context.getRealPath(virtualPath);
 
 				if (model.getMessageType() == Message.SUCCESS) {
 					if (!fileName.contentEquals("user.png")) {
-						File fileUploadDirectory = new File(dir);
+						File fileUploadDirectory = new File(realPath);
 						if (!fileUploadDirectory.exists()) {
 							fileUploadDirectory.mkdirs();
 						}
-						String savePath = dir + File.separator + fileName;
+						String savePath = realPath + File.separator + fileName;
 						part.write(savePath);
 					}
 
@@ -192,19 +193,22 @@ public class UserController extends HttpServlet {
 				String oldProfile = request.getParameter("oldProfile");
 				Timestamp updateDate = new Timestamp(System.currentTimeMillis());
 				Timestamp dob = request.getParameter("dob").isEmpty() ? null : convertStringToTimestamp(request.getParameter("dob"));
+				
+				// file path
+				ServletContext context = getServletContext();
+		        String virtualPath = "/assets/img/profile";
+		        String realPath = context.getRealPath(virtualPath);
 
 				ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address, fileName,
-						phone, roleId, dob, updateDate, user.getId(), oldProfile));
-				ServletContext context = getServletContext();
-				String dir = context.getInitParameter("fileDir");
+						phone, roleId, dob, updateDate, user.getId(), oldProfile),realPath);
 				
 				if (model.getMessageType() == Message.SUCCESS) {
 					if (!fileName.contentEquals("user.png")) {
-						File fileUploadDirectory = new File(dir);
+						File fileUploadDirectory = new File(realPath);
 						if (!fileUploadDirectory.exists()) {
 							fileUploadDirectory.mkdirs();
 						}
-						String savePath = dir + File.separator + fileName;
+						String savePath = realPath + File.separator + fileName;
 						part.write(savePath);
 					}
 
@@ -312,7 +316,6 @@ public class UserController extends HttpServlet {
 
 		// birthday check
 		if (!dob.isEmpty() && !dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			System.out.println("hi");
 			request.setAttribute("dobError", Message.FDOB);
 			error = true;
 		}
@@ -371,8 +374,13 @@ public class UserController extends HttpServlet {
 			String userId = jsonData.getString("id");
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute("userManager");
+			
+			//file path
+			ServletContext context = getServletContext();
+	        String virtualPath = "/assets/img/profile";
+	        String realPath = context.getRealPath(virtualPath);
 
-			ResponseModel model = _userService.Delete(userId, user.getId());
+			ResponseModel model = _userService.Delete(userId, user.getId(), realPath);
 			JSONObject jsonResponse = new JSONObject();
 			jsonResponse.put("status", model.getMessageType());
 			jsonResponse.put("message", model.getMessageName());

@@ -59,7 +59,7 @@
             <li><a class="dropdown-item" href="<%= request.getContextPath() + "/Views/Account/change-password.jsp" %>">Change Password</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
-				<form action="<%= request.getContextPath() + "/HomeController" %>" method="get">
+				<form action="<%= request.getContextPath() + "/HomeController" %>" method="get" class="mb-0">
             		<button type="submit" class="border-0 bg-transparent ps-3">
             		  Logout
             		</button>

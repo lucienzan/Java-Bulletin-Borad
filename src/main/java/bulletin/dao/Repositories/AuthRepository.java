@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import bulletin.common.BCrypt;
+import org.mindrot.jbcrypt.BCrypt;
 import bulletin.common.DbConnection;
 import bulletin.common.Message;
 import bulletin.dao.IRepositories.IAuthRepository;
@@ -90,7 +90,6 @@ public class AuthRepository implements IAuthRepository {
 			preparedStatement = con.prepareStatement(sqlQuery);
 			preparedStatement.setString(1, obj.getEmail());
 			resultSet = preparedStatement.executeQuery();
-
 			while (resultSet.next()) {
 				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				user.setId(resultSet.getString("Id"));
@@ -108,7 +107,7 @@ public class AuthRepository implements IAuthRepository {
 				user.setRoleName(roleName);
 			}
 			
-				if(user.isDeletedFlag()) {
+				if(user.isDeletedFlag() || user.getId() == null) {
 					model.setMessageName(Message.AccountNotFound);
 					model.setMessageType(Message.EXIST);
 				}else if(!user.isActive())

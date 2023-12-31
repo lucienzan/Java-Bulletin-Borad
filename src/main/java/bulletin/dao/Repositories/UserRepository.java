@@ -11,10 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import bulletin.common.BCrypt;
+import org.mindrot.jbcrypt.BCrypt;
 import bulletin.common.DbConnection;
 import bulletin.common.Message;
 import bulletin.dao.IRepositories.IUserRepository;
@@ -33,7 +31,6 @@ public class UserRepository implements IUserRepository {
 
 		List<User> userList = new ArrayList<User>();
 		Role roleModel = new Role();
-		Map<String, String> roleIdToNameMap = new HashMap<>();
 		
 		try {
 			sqlQuery = "SELECT * FROM user WHERE user.Active = true AND user.DeleteFlag = false";
@@ -46,31 +43,20 @@ public class UserRepository implements IUserRepository {
 				String lastName = resultSet.getString("LastName") == null ? "" : resultSet.getString("LastName");
 				user.setFullName(resultSet.getString("FirstName") + " " + lastName);
 				user.setEmail(resultSet.getString("Email"));
-			    String roleId = resultSet.getString("RoleId");
-				user.setRoleId(roleId);
+				user.setRoleId(resultSet.getString("RoleId"));
 				user.setAddress(resultSet.getString("Address"));
 				user.setPhone(resultSet.getString("Phone"));
 				user.setDOB(resultSet.getTimestamp("DOB"));
 				user.setActive(resultSet.getBoolean("Active"));
 				user.setCreatedDate(resultSet.getTimestamp("CreatedDate"));
 				userList.add(user);
-				
-				 // Add role ID and name to the map if not already present
-			    if (!roleIdToNameMap.containsKey(roleId)) {
-			    	for (Role role : roleModel.getRoleList() ) {
-				        if(role.getId().contentEquals(roleId)) {
-				        	roleIdToNameMap.put(roleId, role.getName());
-				        }
-					}
-			    }
 			}
 			
-			if(userList.size() > 0) {
+			if (userList.size() > 0) {
 				for (User user : userList) {
-					 String roleId = user.getRoleId();
-					    if (roleIdToNameMap.containsKey(roleId)) {
-					        user.setRoleId(roleIdToNameMap.get(roleId));
-					}
+					String roleName = roleModel.getRoleList().stream().filter(r -> r.getId().contentEquals(user.getRoleId()))
+							.map(Role::getName).findFirst().orElse(null);
+					user.setRoleId(roleName);
 				}
 			}
 
@@ -172,7 +158,6 @@ public class UserRepository implements IUserRepository {
 				preparedStatement.setString(12, obj.getCreatedUserId());
 				preparedStatement.setTimestamp(13, obj.getCreatedDate());
 				preparedStatement.setBoolean(14, false);
-
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {
@@ -191,7 +176,7 @@ public class UserRepository implements IUserRepository {
 		return model;
 	}
 
-	public ResponseModel Update(User obj) {
+	public ResponseModel Update(User obj,String filePath) {
 		ResponseModel model = new ResponseModel();
 
 		Connection con = DbConnection.GetDbConnection();
@@ -228,7 +213,7 @@ public class UserRepository implements IUserRepository {
 				sqlQuery = "UPDATE user SET FirstName = ?, LastName = ?, Email = ?, Address = ?, Profile = ?, Phone = ?, RoleId = ?";
 				sqlQuery += ", DOB = ?, Active = ?, UpdatedUserId = ?, UpdatedDate = ?, DeleteFlag = ? WHERE Id = ?";
 				if(!obj.getOldProfile().contentEquals(obj.getProfile()) && !obj.getProfile().contentEquals("user.png")){
-					DeleteFile(oldFile);
+					DeleteFile(oldFile,filePath);
 				}
 				
 				preparedStatement = con.prepareStatement(sqlQuery);
@@ -267,7 +252,7 @@ public class UserRepository implements IUserRepository {
 		return model;
 	}
 	
-	public ResponseModel Delete(String id,String currentUser) {
+	public ResponseModel Delete(String id,String currentUser,String path) {
 		ResponseModel model = new ResponseModel();
 		Connection con = DbConnection.GetDbConnection();
 		PreparedStatement preparedStatement = null;
@@ -297,8 +282,7 @@ public class UserRepository implements IUserRepository {
 			if (result == Message.SUCCESS) {
 				model.setMessageType(Message.SUCCESS);
 				model.setMessageName(Message.AccountDelete);
-				
-				DeleteFile(fileName);
+				DeleteFile(fileName,path);
 			}
 
 		} catch (Exception e) {
@@ -311,10 +295,8 @@ public class UserRepository implements IUserRepository {
 		return model;
 	}
 	
-	private boolean DeleteFile(String fileName) throws IOException {
-		if(fileName != null && !fileName.equals("user.png") && !fileName.isEmpty()) {
-			String filePath = "D:\\Java\\Java EE\\BulletinOJT\\src\\main\\webapp\\assets\\img\\profile";
-			
+	private boolean DeleteFile(String fileName,String filePath) throws IOException {
+		if(fileName != null && !fileName.equals("user.png") && !fileName.isEmpty()) {			
         	File fileUploadDirectory = new File(filePath + "\\" + fileName);
         	if(fileUploadDirectory.exists()) {
         		Path fileToDelete = Paths.get(filePath + "\\" + fileName);

@@ -29,13 +29,13 @@ public class UserService {
 		 return model;
 	}
 	
-	public ResponseModel Update(User obj){
-		ResponseModel model = _useRepository.Update(obj);
+	public ResponseModel Update(User obj,String path){
+		ResponseModel model = _useRepository.Update(obj,path);
 		 return model;
 	}
 	
-	public ResponseModel Delete(String id,String userId){
-		ResponseModel model = _useRepository.Delete(id,userId);
+	public ResponseModel Delete(String id,String userId,String path){
+		ResponseModel model = _useRepository.Delete(id,userId,path);
 		 return model;
 	}
 }

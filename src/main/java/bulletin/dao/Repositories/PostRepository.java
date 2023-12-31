@@ -144,7 +144,6 @@ public class PostRepository implements IPostRepository{
 				statement.setString(5, obj.getUpdatedUserId());
 				statement.setTimestamp(6, obj.getUpdatedDate());
 				statement.setString(7, obj.getId());
-				
 				int result = statement.executeUpdate();
 				
 				if (result == Message.SUCCESS) {

@@ -8,6 +8,6 @@ public interface IUserRepository {
 	public List<User> GetAll();
 	public User Get(String id);
 	public ResponseModel Create(User obj);
-	public ResponseModel Update(User obj);
-	public ResponseModel Delete(String id,String currentUser);
+	public ResponseModel Update(User obj, String filePath);
+	public ResponseModel Delete(String id,String currentUser,String filePath);
 }

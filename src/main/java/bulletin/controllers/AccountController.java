@@ -170,11 +170,12 @@ public class AccountController extends HttpServlet {
 					int index = email.indexOf("@gmail.com");
 					String name = email.substring(0, index);
 					ServletContext context = getServletContext();
-					String dir = context.getInitParameter("templateDir");
+					String virtualPath = "/assets/template/reset.html";
+			        String realPath = context.getRealPath(virtualPath);
 					
 					// to get base url
 					String baseUrl = request.getRequestURL().substring(0, request.getRequestURL().length() - request.getRequestURI().length()) + request.getContextPath();
-					String fileContent = readFile(dir);
+					String fileContent = readFile(realPath);
 					String mailBody = fileContent.replace("#name#", name)
 							.replace("#route_link#", baseUrl + "/Views/Account/reset-password.jsp")
 							.replace("#home_route#", baseUrl + "/login.jsp");
