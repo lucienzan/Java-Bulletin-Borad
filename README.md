@@ -15,5 +15,6 @@ you need to put some jar files in WEB-INF/lib directory.
 - xmlbean
 - org.json
 - jarkata.mail
+- jBCrypt
 
 
