@@ -128,7 +128,7 @@ public class UserController extends HttpServlet {
 				request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
 			} else {
 				Part part = request.getPart("profile");
-				fileName = "img_"+UUID.randomUUID().toString()+part.getSubmittedFileName();
+				fileName = part.getSize() != 0 && !part.getSubmittedFileName().isEmpty() ? "img_"+UUID.randomUUID().toString()+part.getSubmittedFileName() : fileName;
 
 				String id = UUID.randomUUID().toString();
 				String email = request.getParameter("email");
@@ -147,6 +147,7 @@ public class UserController extends HttpServlet {
 				ServletContext context = getServletContext();
 		        String virtualPath = "/assets/img/profile";
 		        String realPath = context.getRealPath(virtualPath);
+				request.setAttribute("model", model);
 
 				if (model.getMessageType() == Message.SUCCESS) {
 					if (!fileName.contentEquals("user.png")) {
@@ -158,10 +159,8 @@ public class UserController extends HttpServlet {
 						part.write(savePath);
 					}
 
-					request.setAttribute("model", model);
-					request.getRequestDispatcher("/Views/User/create.jsp").forward(request, response);
+					request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
 				} else {
-					request.setAttribute("model", model);
 					request.getRequestDispatcher("/Views/User/create.jsp").include(request, response);
 				}
 			}
@@ -184,6 +183,7 @@ public class UserController extends HttpServlet {
 				Part part = request.getPart("profile");
 				fileName = part.getSize() != 0 ? "img_"+UUID.randomUUID().toString()+part.getSubmittedFileName() : fileName;
 				String id = request.getParameter("id");
+				String profileRoute = request.getParameter("profileRoute");
 				String email = request.getParameter("email");
 				String firstName = request.getParameter("firstName");
 				String lastName = request.getParameter("lastName");
@@ -201,6 +201,7 @@ public class UserController extends HttpServlet {
 
 				ResponseModel model = _userService.Update(new User(id, firstName, lastName, email, address, fileName,
 						phone, roleId, dob, updateDate, user.getId(), oldProfile),realPath);
+				request.setAttribute("model", model);
 				
 				if (model.getMessageType() == Message.SUCCESS) {
 					if (!fileName.contentEquals("user.png")) {
@@ -212,10 +213,12 @@ public class UserController extends HttpServlet {
 						part.write(savePath);
 					}
 
-					request.setAttribute("model", model);
-					request.getRequestDispatcher("/Views/User/edit.jsp").forward(request, response);
+					if(!profileRoute.isEmpty()) {
+						response.sendRedirect("/BulletinOJT/profile?userId="+id+ "&status=success");
+					} else {
+						request.getRequestDispatcher("/Views/User/user-list.jsp").forward(request, response);
+					}
 				} else {
-					request.setAttribute("model", model);
 					request.getRequestDispatcher("/Views/User/edit.jsp").include(request, response);
 				}
 			}
@@ -249,7 +252,6 @@ public class UserController extends HttpServlet {
 		String address = request.getParameter("address");
 		String phone = request.getParameter("phone");
 		Part part = request.getPart("profile");
-		String url = request.getRequestURL().toString();
 
 		// fistName check
 		if (firstName.contentEquals("")) {
@@ -327,18 +329,17 @@ public class UserController extends HttpServlet {
 		}
 
 		// profile check
-		if (part.getSize() == 0 && url.endsWith("user-create")) {
-			request.setAttribute("fileError", Message.RFile);
-			error = true;
-		} else if (part.getSize() > 1024 * 1024 * 10) {
-			request.setAttribute("fileError", Message.FileSize);
-			error = true;
-		} else if (part.getSize() != 0 && part.getSize() < 1024 * 1024 * 10) {
-			String fileName = part.getSubmittedFileName();
-			boolean isAllowExtension = checkExtension(fileName);
-			if (isAllowExtension == false) {
-				request.setAttribute("fileError", Message.FileTypeError);
+		if (part.getSize() != 0 && !part.getSubmittedFileName().isEmpty()) {
+			if (part.getSize() > 1024 * 1024 * 10) {
+				request.setAttribute("fileError", Message.FileSize);
 				error = true;
+			} else if (part.getSize() != 0 && part.getSize() < 1024 * 1024 * 10) {
+				String fileName = part.getSubmittedFileName();
+				boolean isAllowExtension = checkExtension(fileName);
+				if (isAllowExtension == false) {
+					request.setAttribute("fileError", Message.FileTypeError);
+					error = true;
+				}
 			}
 		}
 

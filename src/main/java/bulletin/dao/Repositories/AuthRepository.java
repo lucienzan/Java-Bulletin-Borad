@@ -43,20 +43,21 @@ public class AuthRepository implements IAuthRepository {
 				model.setMessageType(Message.EXIST);
 				
 			} else {
-				sqlQuery = "INSERT INTO user (Id,FirstName,Email,Profile,RoleId,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
-				sqlQuery += "VALUES (?,?,?,?,?,?,?,?,?)";
+				sqlQuery = "INSERT INTO user (Id,FirstName,LastName,Email,Profile,RoleId,Password,CreatedUserId,CreatedDate,DeleteFlag) ";
+				sqlQuery += "VALUES (?,?,?,?,?,?,?,?,?,?)";
 				String generatedSecuredPasswordHash = BCrypt.hashpw(obj.getPassword(), BCrypt.gensalt(12));
 
 				preparedStatement = con.prepareStatement(sqlQuery);
 				preparedStatement.setString(1, obj.getId());
 				preparedStatement.setString(2, obj.getFirstName());
-				preparedStatement.setString(3, obj.getEmail());
-				preparedStatement.setString(4, "user.png");
-				preparedStatement.setString(5, userRoleId);
-				preparedStatement.setString(6, generatedSecuredPasswordHash);
-				preparedStatement.setString(7, obj.getCreatedUserId());
-				preparedStatement.setTimestamp(8, obj.getCreatedDate());
-				preparedStatement.setBoolean(9, false);
+				preparedStatement.setString(3, obj.getLastName());
+				preparedStatement.setString(4, obj.getEmail());
+				preparedStatement.setString(5, "user.png");
+				preparedStatement.setString(6, userRoleId);
+				preparedStatement.setString(7, generatedSecuredPasswordHash);
+				preparedStatement.setString(8, obj.getCreatedUserId());
+				preparedStatement.setTimestamp(9, obj.getCreatedDate());
+				preparedStatement.setBoolean(10, false);
 				int result = preparedStatement.executeUpdate();
 
 				if (result == Message.SUCCESS) {

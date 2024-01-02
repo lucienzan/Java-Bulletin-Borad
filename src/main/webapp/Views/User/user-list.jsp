@@ -8,7 +8,20 @@ if(userInfo.getRoleName() != null){
 }
 %>
 		<div>
-		<div class="mb-3 d-flex justify-content-between align-items-center">
+	<c:choose>
+		<c:when test="${ model.getMessageType() == 1 }">
+			<div class="alert alert-success col-12" role="alert">
+				<c:out value="${ model.getMessageName() }"></c:out>
+			</div>
+		</c:when>
+		<c:when
+			test="${ model.getMessageType() == 2 || model.getMessageType() == 3 }">
+			<div class="alert alert-danger col-12" role="alert">
+				<c:out value="${ model.getMessageName() }"></c:out>
+			</div>
+		</c:when>
+	</c:choose>
+	<div class="mb-3 d-flex justify-content-between align-items-center">
 			<h3>User List</h3>
 			<a class="btn btn-primary" href="<%= request.getContextPath()+"/UserController/user-create" %>">Create</a>
 		</div>

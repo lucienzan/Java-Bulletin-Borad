@@ -29,10 +29,24 @@
 				</div>
 			</c:if>
 			<div class="col-8 col-lg-10 bx-shadow p-5 p-lg-0">
-			<div class="row align-items-center justify-content-between ">
+			<div class="row">
 				<div class="col-10 col-lg-4 m-auto">
-					<h3 class="text-center">Sign Up</h3>
+					<h3 class="text-center mt-3">Sign Up</h3>
 					<form action="<%= request.getContextPath() + "/AccountController/register"%>" method="post">
+						<div class="row">
+						<div class="form-group mb-3 col-6">
+							<label class="form-label" for="firstName">First Name</label> 
+							<input required type="text" name="firstName" id="firstName" value="${ user.getFirstName() }" class="form-control rounded ${not empty requestScope.firstNameError ? 'is-invalid' : ''}" placeholder="John">
+		                   	<c:if test="${requestScope.firstNameError != null}">
+								<div class="invalid-feedback">
+									<c:out value="${requestScope.firstNameError}" />
+								</div>
+							</c:if>
+						</div>
+						<div class="form-group mb-3 col-6">
+							<label class="form-label" for="lastName">Last Name</label> 
+                        	<input type="text" name="lastName" class="form-control rounded" value="${ user.getLastName() }" placeholder="Doe" id="lastName">
+						</div>
 						<div class="form-group mb-3">
 							<label class="form-label" for="email">Email address</label> 
 							<input class="form-control ${not empty requestScope.emailError || model.getMessageName() != null  ? 'is-invalid' : ''}" type="email" value="<%=user.getEmail() %>" placeholder="Enter your email" required id="email" name="email">
@@ -49,28 +63,30 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
-						<div class="form-group mb-3">
+						<div class="form-group col-6">
 							<label class="form-label" for="password">Password</label> 
 							<input class="form-control ${not empty requestScope.passwordError ? 'is-invalid' : ''}" type="password" placeholder="password" required id="password" name="password">
-							<c:if test="${requestScope.passwordError != null}">
-								<div class="invalid-feedback">
-									<c:out value="${requestScope.passwordError}" />
-								</div>
-							</c:if>
 						</div>
-						<div class="form-group mb-3">
+						<div class="form-group col-6">
 							<label class="form-label" for="cpassword">Confirm Password</label> 
 							<input class="form-control ${not empty requestScope.cpasswordError ? 'is-invalid' : ''}" type="password" placeholder="confirm password" required id="cpassword" name="cpassword">
-							<c:if test="${requestScope.cpasswordError != null}">
-								<div class="invalid-feedback">
-									<c:out value="${requestScope.cpasswordError}" />
-								</div>
-							</c:if>
 						</div>
-						<button type="submit" class="btn btn-dark w-100 p-2">Sign Up</button>
-						<div class="text-center mt-4">
+						<c:if test="${requestScope.passwordError != null}">
+							<div class="error-meg">
+								<c:out value="${requestScope.passwordError}" />
+							</div>
+						</c:if>
+						<c:if test="${requestScope.cpasswordError != null}">
+							<div class="error-meg">
+								<c:out value="${requestScope.cpasswordError}" />
+							</div>
+						</c:if>
+						<small class="text-seconday pwd-describe mt-3">The first character must be a capital letter, and the password must include at least one lower case letter, one number, and be longer than 8 characters.</small>
+						<button type="submit" class="btn btn-dark w-100 p-2 mt-3">Sign Up</button>
+						<div class="text-center mt-3 mb-3">
 							<span class="text-secondary">Already have an account?</span>
 							<a href="/BulletinOJT/login.jsp" class="cc-tag text-decoration-none text-dark">Log In</a>
+						</div>
 						</div>
 					</form>
 				</div>

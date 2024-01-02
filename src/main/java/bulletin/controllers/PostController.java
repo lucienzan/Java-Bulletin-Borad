@@ -129,7 +129,7 @@ public class PostController extends HttpServlet {
 			Timestamp createdDate = new Timestamp(System.currentTimeMillis());
 			ResponseModel model = _postService.Create(new Post(id, title, description, isPublished, createdDate, user.getId()));
 			request.setAttribute("model", model);
-			request.getRequestDispatcher("/Views/Post/create.jsp").forward(request, response);
+			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		}
 	}
 
@@ -154,7 +154,7 @@ public class PostController extends HttpServlet {
 
 			ResponseModel model = _postService.Update(post);
 			request.setAttribute("model", model);
-			request.getRequestDispatcher("/Views/Post/edit.jsp").forward(request, response);
+			request.getRequestDispatcher("/Views/Post/post-list.jsp").forward(request, response);
 		}
 	}
 
@@ -278,7 +278,7 @@ public class PostController extends HttpServlet {
 				}
 				
 				response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-				response.setHeader("Content-Disposition", "attachment; filename=example.xlsx");
+				response.setHeader("Content-Disposition", "attachment; filename=Post.xlsx");
 				workbook.write(out);
 			} catch (Exception e) {
 				e.printStackTrace();

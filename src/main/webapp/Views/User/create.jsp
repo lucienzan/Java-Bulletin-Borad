@@ -124,8 +124,7 @@ if(userInfo.getRoleName() != null){
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="profile" class="form-label">Profile</label>
-                        <span class="text-danger fw-bold">*</span>
-                        <input required accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile" onchange="fileSelect()">
+                        <input accept="image/*, image/png, image/jpg, image/jpeg" type="file" class="form-control rounded ${not empty requestScope.fileError ? 'is-invalid' : ''}" type="file" name="profile" id="profile" onchange="fileSelect()">
                         <c:if test="${requestScope.fileError != null}">
 							<div class="invalid-feedback">
 								<c:out value="${requestScope.fileError}" />

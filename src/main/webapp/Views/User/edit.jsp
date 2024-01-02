@@ -27,10 +27,10 @@ if(userInfo.getRoleName() != null){
 			<h3>User Edit</h3>
 		</div>
 		<div>
-			<form id="myForm" action="<%= request.getContextPath()+"/updateUser" %>" method="POST" enctype="multipart/form-data" class="g-3">
+			<form id="myForm" action="<%= request.getContextPath()+"/updateUser?action=" %>${param.action}" method="POST" enctype="multipart/form-data" class="g-3">
 			<input type="hidden" name="id" value="${ userModel.getId() }">
 			<input type="hidden" name="oldProfile" value="${ userModel.getOldProfile() }">
-
+			<input type="hidden" name="profileRoute" value="${ param.action }">
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
                         <label for="firstName" class="form-label">First Name</label>

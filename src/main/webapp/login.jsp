@@ -35,7 +35,7 @@
 				</div>
 			</c:if>
 			<div class="col-8 col-lg-10 bx-shadow p-5 p-lg-0">
-			<div class="row align-items-center justify-content-between ">
+			<div class="row">
 				<div class="col-10 col-lg-4 m-auto">
 					<h3 class="text-center">Sign In</h3>
 					<form action="<%= request.getContextPath() + "/AccountController/login"%>" method="post">

@@ -31,6 +31,16 @@ footer {
 
 .login-img {
 	vertical-align: bottom;
+	height: 100%;
+}
+
+.pwd-describe {
+	font-size: 12px;
+}
+
+.error-meg {
+ font-size: .875em;
+ color: #dc3545;
 }
 
 #previewImage {

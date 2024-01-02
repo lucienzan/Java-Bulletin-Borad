@@ -97,11 +97,12 @@ public class AccountController extends HttpServlet {
 		} else {
 			Timestamp createDate = new Timestamp(System.currentTimeMillis());
 			String id = UUID.randomUUID().toString();
-			int getTarget = request.getParameter("email").toString().lastIndexOf("@");
-			String firstName = request.getParameter("email").toString().substring(0, getTarget);
-
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			
 			user.setId(id);
 			user.setFirstName(firstName);
+			user.setLastName(lastName.isEmpty() ? null : lastName);
 			user.setEmail(request.getParameter("email"));
 			user.setPassword(request.getParameter("password"));
 			user.setCreatedDate(createDate);
@@ -132,7 +133,11 @@ public class AccountController extends HttpServlet {
 
 			ResponseModel model = _accountService.ChangePassword(userModel);
 			request.setAttribute("model", model);
-			request.getRequestDispatcher("/Views/Account/change-password.jsp").forward(request, response);
+			if(model.getMessageType() == Message.SUCCESS) {
+				response.sendRedirect("/BulletinOJT/profile?userId="+user.getId()+ "&status=success");
+			}else {
+				request.getRequestDispatcher("/Views/Account/change-password.jsp").forward(request, response);
+			}
 		}
 	}
 
@@ -242,6 +247,8 @@ public class AccountController extends HttpServlet {
 		String passwordPattern = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
 		String emailPattern = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
 		String password = request.getParameter("password");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
 		String email = request.getParameter("email");
 		String url = request.getRequestURL().toString();
 		if (!url.endsWith("change-password")
@@ -262,6 +269,23 @@ public class AccountController extends HttpServlet {
 				error = true;
 			} else if (!password.matches(passwordPattern)) {
 				request.setAttribute("passwordError", Message.FPassword);
+				error = true;
+			}
+		}
+		
+		if (url.endsWith("register")) {
+			// fistName check
+			if (firstName.contentEquals("")) {
+				request.setAttribute("firstNameError", Message.RFirstname);
+				error = true;
+			} else if (firstName.length() > 20) {
+				request.setAttribute("firstNameError", Message.LengthCheck);
+				error = true;
+			}
+
+			// lastName check
+			if (lastName.contentEquals("") && lastName.length() > 20) {
+				request.setAttribute("lastNameError", Message.LengthCheck);
 				error = true;
 			}
 		}
